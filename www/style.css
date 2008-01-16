@@ -1,0 +1,116 @@
+/*
+ * $Id$
+ * 
+ * (c) 2008 Monzoon Networks AG. All rights reserved.
+ */
+
+* {
+	font-family: Arial, Helvetia, sans-serif;
+	font-size: 10pt;
+}
+
+.title {
+	font-size: 1.2em;
+	font-weight: bold;
+}
+
+.pgtitle {
+	font-size: 1.5em;
+	font-weight: bold;
+	border-bottom: 1px solid #777;
+	margin-bottom: 1em;
+	padding-bottom: 0.2em;
+}
+
+.small {
+	font-size: 0.9em;
+}
+
+.rank {
+	font-size: 2em;
+	font-weight: bold;
+	color: #aaa;
+	margin-top: 0.5em;
+}
+
+hr {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+table.astable {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	border: 1px solid #ccc;
+}
+
+table.astable tr.odd td, table.astable tr.odd th {
+	background-color: #eeeeee;
+}
+
+table.astable tr.even td, table.astable tr.even th {
+	background-color: #f7f7f7;
+}
+
+table.astable td, table.astable th {
+	border-bottom: 1px solid #ccc;
+	padding: 0;
+}
+
+table.astable th {
+	text-align: left;
+	vertical-align: top;
+	padding-right: 2em;
+	font-weight: normal;
+	padding: 0.8em 0.8em 0.8em 0.8em;
+	width: 25em;
+}
+
+.detailgraph {
+	border: 1px solid #aaa;
+	margin-bottom: 1.5em;
+	margin-top: 0.8em;
+	background-color: #eeeeee;
+}
+
+div#legend {
+	position: fixed;
+	right: 20px;
+	bottom: 20px;
+	background-color: white;
+	padding: 0.5em;
+	border: 1px solid #aaa;
+}
+
+#legend table {
+	border-collapse: collapse;
+	padding: 0;
+	margin: 0;
+}
+
+#legend table td {
+	padding: 0;
+	margin: 0;
+}
+
+#nav {
+	float: right;
+}
+
+#nav a, #nav a:visited {
+	text-decoration: none;
+	font-weight: bold;
+	color: #0000ee;
+}
+
+#nav a:hover {
+	text-decoration: underline;
+}
+
+#footer {
+	border-top: 1px solid #aaa;
+	font-size: 0.8em;
+	margin-top: 1em;
+	padding-top: 0.5em;
+}
