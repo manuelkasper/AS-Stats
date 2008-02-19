@@ -2,7 +2,7 @@
 /*
  * $Id$
  * 
- * (c) 2008 Monzoon Networks AG. All rights reserved.
+ * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
 require_once('func.inc');
@@ -12,10 +12,12 @@ if ($as)
 	$asinfo = getASInfo($as);
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Refresh" content="300" />
 	<title>History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
@@ -28,7 +30,7 @@ if ($as)
 <div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></div>
 
 <?php if (!file_exists("$rrdpath/$as.rrd")): ?>
-No data found for AS <?php echo $as; ?>
+<p>No data found for AS <?php echo $as; ?></p>
 <?php else: ?>
 <div class="title">Daily</div>
 <img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>" alt="daily graph" />
@@ -46,14 +48,14 @@ No data found for AS <?php echo $as; ?>
 
 <div class="pgtitle">View history for an AS</div>
 
-<form action="" method="GET">
-AS: <input type="text" name="as" size="6">
-<input type="submit" value="Go">
+<form action="" method="get">
+AS: <input type="text" name="as" size="6" />
+<input type="submit" value="Go" />
 </form>
 <?php endif; ?>
 
 <div id="footer">
-&copy; 2008 Monzoon Networks AG. All rights reserved.
+AS-Stats v1 written by Manuel Kasper, Monzoon Networks AG.
 </div>
 
 </body>

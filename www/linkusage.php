@@ -2,7 +2,7 @@
 /*
  * $Id$
  * 
- * (c) 2008 Monzoon Networks AG. All rights reserved.
+ * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
 require_once('func.inc');
@@ -10,10 +10,12 @@ require_once('func.inc');
 $knownlinks = getknownlinks();
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Refresh" content="300" />
 	<title>Link usage</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
@@ -35,7 +37,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 	</th>
 	<td>
-		<img src="linkgraph.php?link=<?php echo $link['tag']; ?>&width=500&height=300" width="581" height="494" border="0">
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&width=500&height=300" width="581" height="494" border="0" />
 	</td>
 </tr>
 <?php $i++; endforeach; ?>
@@ -43,7 +45,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 </table>
 
 <div id="footer">
-&copy; 2008 Monzoon Networks AG. All rights reserved.
+AS-Stats v1 written by Manuel Kasper, Monzoon Networks AG.
 </div>
 
 </body>

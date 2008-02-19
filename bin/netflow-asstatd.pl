@@ -2,28 +2,28 @@
 #
 # $Id$
 #
-# (c) 2008 Monzoon Networks AG. All rights reserved.
+# written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 use strict;
 use IO::Socket;
 use RRDs;
 
-my %knownlinks = (
-	# key format is "<router IP>_<SNMP ifindex>"
-	# max. alias length is 16 characters; only [a-zA-Z0-9] allowed
-	'80.254.79.250_44' => 'tix',
-	'80.254.79.250_45' => 'sunrise',
-	'80.254.79.250_47' => 'swissixzrh',
-	'80.254.79.250_65' => 'dtag',
-	'80.254.79.251_7' => 'colt',
-	'80.254.79.251_8' => 'swissixglb'
-);
+if ($#ARGV != 1) {
+	die("Usage: $0 <path to RRD file directory> <path to known links file>\n");
+}
+
+my $rrdpath = $ARGV[0];
+my $knownlinksfile = $ARGV[1];
+
+if (! -d $rrdpath) {
+	die("$rrdpath does not exist or is not a directory\n");
+}
+
+my %knownlinks;
 
 my $ascache = {};
 my $ascache_lastflush = 0;
 my $ascache_flush_interval = 60;
-
-my $rrdpath = "/var/db/netflow/rrd";
 
 my $server_port = 9000;
 my $MAXREAD = 8192;
@@ -46,6 +46,9 @@ sub TERM {
 	print "SIGTERM received\n";
 	exit 0;
 }
+
+# read known links file
+read_knownlinks();
 
 # prepare to listen for NetFlow UDP packets
 my $server = IO::Socket::INET->new(LocalPort => $server_port, Proto => "udp")
@@ -195,9 +198,9 @@ sub getrrdfile {
 			push(@args, "DS:${alias}_in:ABSOLUTE:300:U:U");
 			push(@args, "DS:${alias}_out:ABSOLUTE:300:U:U");
 		}
-		push(@args, "RRA:AVERAGE:0:1:576");		# 48 hours at 5 minute resolution
-		push(@args, "RRA:AVERAGE:0:12:168");	# 1 week at 1 hour resolution
-		push(@args, "RRA:AVERAGE:0:288:366");	# 1 year at 1 day resolution
+		push(@args, "RRA:AVERAGE:0.99999:1:576");	# 48 hours at 5 minute resolution
+		push(@args, "RRA:AVERAGE:0.99999:12:168");	# 1 week at 1 hour resolution
+		push(@args, "RRA:AVERAGE:0.99999:288:366");	# 1 year at 1 day resolution
 		RRDs::create($rrdfile, "--start", $startts, @args);
 		
 		my $ERR = RRDs::error;
@@ -208,4 +211,16 @@ sub getrrdfile {
 	}
 	
 	return $rrdfile;
+}
+
+sub read_knownlinks {
+	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile!");
+	while (<KLFILE>) {
+		chomp;
+		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
+		
+		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
+		$knownlinks{"${routerip}_${ifindex}"} = $tag;
+	}
+	close(KLFILE);
 }

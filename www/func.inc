@@ -2,28 +2,62 @@
 /*
  * $Id$
  * 
- * (c) 2008 Monzoon Networks AG. All rights reserved.
+ * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
-$dbpath = "/var/db/netflow";
-$rrdpath = "$dbpath/rrd";
+$rrdpath = "/var/db/netflow/rrd";
+$daystatsfile = "/var/db/netflow/asstats_day.txt";
 $rrdtool = "/usr/local/bin/rrdtool";
 
-$knownlinksfile = "/monzoon/conf/netflow-knownlinks";
-$topasdayfile = "$dbpath/top50_day.txt";
+$asinfofile = "asinfo.txt";
+$knownlinksfile = "/etc/netflow-knownlinks";
 
-$link = mysql_connect("localhost", "netflow", "ycCeDm71ck");
-mysql_select_db("netflow", $link);
-
+/* note: you might want to put the data from asinfo.txt into an SQL
+   database to avoid having to read the whole file all the time */
 function getASInfo($asnum) {
-	$row = mysql_fetch_array(mysql_query("select * from asnums where asn='" . addslashes($asnum) . "'"));
+	global $asinfodb;
+	
+	if (!isset($asinfodb))
+		$asinfodb = readasinfodb();
+	
+	if ($asinfodb[$asnum])
+		return $asinfodb[$asnum];
+	else
+		return array(name => "AS$asnum", descr => "AS $asnum");
+	
+	/*$row = mysql_fetch_array(mysql_query("select * from asnums where asn='" . addslashes($asnum) . "'"));
 	
 	if ($row) {
 		return array(name => $row['asname'], descr => $row['descr'], country => $row['country']);
 	} else {
-		/* not found */
 		return array(name => "AS$asnum", descr => "AS $asnum");
+	}*/
+}
+
+function readasinfodb() {
+	global $asinfofile;
+	
+	if (!file_exists($asinfofile))
+		return array();
+	
+	$fd = fopen($asinfofile, "r");
+	$asinfodb = array();
+	while (!feof($fd)) {
+		$line = trim(fgets($fd));
+		if (preg_match("/(^\\s*#)|(^\\s*$)/", $line))
+			continue;	/* empty line or comment */
+		
+		list($asn,$asname,$descr,$country) = explode("\t", $line);
+		
+		$asinfodb[$asn] = array(
+			name => $asname,
+			descr => $descr,
+			country => $country
+		);
 	}
+	fclose($fd);
+	
+	return $asinfodb;
 }
 
 function getknownlinks() {
@@ -52,10 +86,10 @@ function getknownlinks() {
 }
 
 function getasstats_top($ntop) {
-	global $dbpath;
+	global $daystatsfile;
 	
 	/* first step: walk the data for all ASes to determine the top 5 for the given link */
-	$fd = fopen("$dbpath/asstats_day.txt", "r");
+	$fd = fopen($daystatsfile, "r");
 	if (!$fd)
 		return array();
 	$cols = explode("\t", trim(fgets($fd)));
@@ -74,7 +108,7 @@ function getasstats_top($ntop) {
 		$tot_out = 0;
 		
 		for ($i = 1; $i < count($els); $i++) {
-			if (strpos($cols[$i], "in") !== false)
+			if (strpos($cols[$i], "_in") !== false)
 				$tot_in += $els[$i];
 			else
 				$tot_out += $els[$i];
@@ -100,6 +134,5 @@ function format_bytes($bytes) {
 	else
 		return "$bytes bytes";
 }
-
 
 ?>

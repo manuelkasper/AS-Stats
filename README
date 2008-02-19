@@ -1,0 +1,145 @@
+AS-Stats v1 (2008-02-19)
+a simple tool to generate per-AS traffic graphs from NetFlow records
+by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
+--------------------------------------------------------------------
+
+How it works
+------------
+
+A Perl script (netflow-asstatd.pl) collects NetFlow v8 AS aggregation records
+from one or more routers. It caches them for about a minute (to prevent
+excessive writes to RRD files), identifies the link that each record refers
+to (by means of the SNMP in/out interface index), maps it to a corresponding
+"known link" and RRD data source, and then runs RRDtool. To avoid losing
+new NetFlow records while the RRD files are updated, the update task is
+run in a separate process.
+
+For each AS, a separate RRD file is created as needed. It contains two data
+sources for each link - one for inbound and one for outbound traffic.
+In generated per-AS traffic graphs, inbound traffic is shown as positive,
+while outbound traffic is shown as negative values.
+
+Another Perl script, rrd-extractstats.pl, is meant to run about once per hour.
+It sums up per-AS and link traffic during the last 24 hours, sorts the ASes
+by total traffic (descending) and writes the results to a text file. This
+is then used to display the "top N AS" and other stats by the provided PHP
+scripts.
+
+
+Prerequisites
+-------------
+
+- Perl 5.8
+- RRDtool 1.2 (with Perl "RRDs" library)
+- web server with PHP 5
+- one or more routers than can generate NetFlow v8 AS aggregation records
+
+
+Installation
+------------
+
+- Copy the perl scripts netflow-asstatd.pl and rrd-extractstats.pl to the
+  machine that will collect NetFlow records
+
+- Create a "known links" file with the following information about each
+  link that you want to appear in your AS stats:
+  	
+  	- IP address of router (= source IP of NetFlow datagrams)
+  	- SNMP interface index of interface (use "show snmp mib ifmib ifindex"
+  	  to find out)
+  	- a short "tag" (15 chars max., alphanumerics only) that will be used
+  	  internally (e.g. for RRD DS names)
+  	- a human-readable description (will appear in the generated graphs)
+  	- a color code for the graphs (HTML style, 6 hex digits)
+  
+  See the example file provided (netflow-knownlinks) for the format.
+
+- Create a directory to hold per-AS RRD files. For each AS, about 128 KB of
+  storage are required, and there could be (in theory) up to 64511 ASes.
+
+- Start netflow-asstatd.pl in the background (or, better yet, write a
+  startup script for your operating system to automatically start
+  netflow-asstatd.pl on boot):
+  
+  	nohup netflow-asstatd.pl /path/to/rrd/dir /path/to/knownlinks &
+
+  By default, netflow-asstatd.pl will listen on port 9000 (UDP) for NetFlow
+  datagrams. Edit $server_port in the script if you want to change that.
+  It's a good idea to make sure only UDP datagrams from your trusted routers
+  will reach the machine running netflow-asstatd.pl (firewall etc.).
+
+- Have your router(s) send NetFlow v8 AS aggregation records to your machine.
+  This is typically done with commands like the following (Cisco IOS):
+
+		ip flow-cache timeout active 5
+		
+		! enable ip flow ingress on all interfaces listed in your
+		! "known links" file
+		int Gi0/x.y
+		  ip flow ingress
+		  
+		ip flow-export source <source interface>
+		ip flow-export version 5 origin-as
+		ip flow-aggregation cache as
+		 cache timeout active 5
+		 export destination <IP address of server running AS stats> 9000
+		 enabled  
+
+  Note that the version has to be specified as 5, even though the AS
+  aggregation records will actually be v8. Also, setting the global flow
+  cache timeout to 5 minutes is necessary to get "smooth" traffic graphs
+  (default is 30 minutes), as a flow is only counted when it expires from
+  the cache. Decreasing the flow-cache timeout may result in a slight
+  increase in CPU usage (and NetFlow AS aggregation takes its fair share of
+  CPU as well, of course).
+
+- Wait 1-2 minutes. You should then see new RRD files popping up in the
+  directory that you defined/created earlier on. If not, make sure that
+  netflow-asstatd.pl is running, not spewing out any error messages, and that
+  the NetFlow datagrams are actually reaching your machine (tcpdump...).
+
+- Add a cronjob to run the following command every hour:
+
+	rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks \
+		/path/to/asstats_day.txt
+
+  That script will go through all RRD files and collect per-link summary
+  stats for each AS, sort them by total traffic (descending), and write them
+  to a text file. The "top N AS" page uses this to determine which ASes to show.
+  
+- Copy the contents of the "www" directory to somewhere within your web server's
+  document root and change file paths in func.inc as necessary.
+
+- Wait a few hours for data to accumulate. :)
+
+- Access the provided PHP scripts via your web server and marvel at the
+  (hopefully) beautiful graphs.
+
+
+Adding a new link
+-----------------
+Adding a new link involves adding two new data sources to all RRD files.
+This is a bit of a PITA since RRDtool itself doesn't provide a command to do
+that. A simple (but slow) Perl script that is meant to be used with RRDtool's
+XML dump/restore feature is provided (add_ds_proc.pl, add_ds.sh). Note that
+netflow-asstatd.pl should be stopped while modifying RRD files, to avoid
+breaking them with concurrent modifications.
+
+
+Changing the RRAs
+-----------------
+By default, the created RRDs keep data as follows:
+
+	* 48 hours at 5 minute resolution
+	* 1 week at 1 hour resolution
+	* 1 year at 1 day resolution
+
+If you want to change that, modify the getrrdfile() function in
+netflow-asstatd.pl and delete any old RRD files.
+
+
+To do
+-----
+
+- rrd-extractstats.pl uses a lot of memory and could probably use some
+  optimization.

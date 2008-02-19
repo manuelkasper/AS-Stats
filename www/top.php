@@ -17,10 +17,12 @@ if ($ntop > 200)
 $topas = getasstats_top($ntop);
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Refresh" content="300" />
 	<title>Top <?php echo $ntop; ?> AS</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
@@ -28,7 +30,7 @@ $topas = getasstats_top($ntop);
 <body>
 
 <div id="nav">
-<form action="" method="GET">
+<form action="" method="get">
 Number of AS: 
 <input type="text" name="n" size="4" value="<?php echo $ntop; ?>" />
 <input type="submit" value="Go" style="margin-right: 2em" />
@@ -62,7 +64,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 	</th>
 	<td>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img src="gengraph.php?as=<?php echo $as; ?>&width=500&height=150&nolegend=1" width="581" height="204" border="0"></a>
+		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&width=500&height=150&nolegend=1" width="581" height="204" border="0" /></a>
 	</td>
 </tr>
 <?php $i++; endforeach; ?>
@@ -88,7 +90,7 @@ foreach ($knownlinks as $link) {
 </div>
 
 <div id="footer">
-&copy; 2008 Monzoon Networks AG. All rights reserved.
+AS-Stats v1 written by Manuel Kasper, Monzoon Networks AG.
 </div>
 
 </body>

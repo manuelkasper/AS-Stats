@@ -2,12 +2,15 @@
 /*
  * $Id$
  * 
- * (c) 2008 Monzoon Networks AG. All rights reserved.
+ * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
 require_once('func.inc');
 
 $numtop = 10;
+if ($_GET['numtop'] && $_GET['numtop'] <= 50)
+	$numtop = $_GET['numtop'];
+
 $ascolors = array("D41C0E", "E45605", "FECF12", "2FA11C", "19BB7C", "0A4484", "0A7484", "4CB4C4", "971928", "1f348c");
 
 $link = $_GET['link'];
@@ -15,7 +18,7 @@ if (!preg_match("/^[a-z0-9]+$/", $link))
 	die("Invalid link");
 
 /* first step: walk the data for all ASes to determine the top 5 for the given link */
-$fd = fopen("$dbpath/asstats_day.txt", "r");
+$fd = fopen($daystatsfile, "r");
 $cols = explode("\t", trim(fgets($fd)));
 $asstats = array();
 

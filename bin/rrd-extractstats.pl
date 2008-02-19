@@ -2,28 +2,24 @@
 #
 # $Id$
 #
-# (c) 2008 Monzoon Networks AG. All rights reserved.
+# written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
+use strict;
 use RRDs;
 
-if ($#ARGV != 0) {
-	die("Usage: $0 outfile\n");
+if ($#ARGV != 2) {
+	die("Usage: $0 <path to RRD file directory> <path to known links file> outfile\n");
 }
 
-my %knownlinks = (
-	# key format is "<router IP>_<SNMP ifindex>"
-	# max. alias length is 16 characters; only [a-zA-Z0-9] allowed
-	'80.254.79.250_44' => 'tix',
-	'80.254.79.250_45' => 'sunrise',
-	'80.254.79.250_47' => 'swissixzrh',
-	'80.254.79.250_65' => 'dtag',
-	'80.254.79.251_7' => 'colt',
-	'80.254.79.251_8' => 'swissixglb'
-);
-my @links = values %knownlinks;
+my $rrdpath = $ARGV[0];
+my $knownlinksfile = $ARGV[1];
+my $statsfile = $ARGV[2];
 
-my $rrdpath = "/var/db/netflow/rrd";
-my $statsfile = $ARGV[0];
+my %knownlinks;
+
+read_knownlinks();
+
+my @links = values %knownlinks;
 
 # walk through all RRD files in the given path and extract stats for all links
 # from them; write the stats to a text file, sorted by total traffic
@@ -63,7 +59,7 @@ my @asorder = sort {
 	return $total_b <=> $total_a;
 } keys %$astraffic;
 
-open(STATSFILE, ">$statsfile");
+open(STATSFILE, ">$statsfile.tmp");
 
 # print header line
 print STATSFILE "as";
@@ -85,6 +81,8 @@ foreach my $as (@asorder) {
 }
 
 close(STATSFILE);
+
+rename("$statsfile.tmp", $statsfile);
 
 sub gettraffic {
 
@@ -131,4 +129,16 @@ sub gettraffic {
 	}
 	
 	return $retdata;
+}
+
+sub read_knownlinks {
+	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile!");
+	while (<KLFILE>) {
+		chomp;
+		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
+		
+		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
+		$knownlinks{"${routerip}_${ifindex}"} = $tag;
+	}
+	close(KLFILE);
 }

@@ -1,8 +1,9 @@
 # Router IP		SNMP ifindex	tag				description		color
 # note: tabs must be used to separate fields (not spaces)
-80.254.79.250	45				sunrise			Sunrise			D41C0E
-80.254.79.250	65				dtag			DTAG			E45605
-80.254.79.251	7				colt			Colt			FECF12
-80.254.79.250	44				tix				TIX				0A4484
-80.254.79.250	47				swissixzrh		SwissIX zrh		0A7484
-80.254.79.251	8				swissixglb		SwissIX glb		4CB4C4
+192.0.2.1		15				uplink1			Uplink 1		D41C0E
+192.0.2.1		23				uplink2			Uplink 2		E45605
+192.0.2.2		4				uplink3			Uplink 3		FECF12
+192.0.2.3		11				uplink4			Uplink 4		5EA631
+192.0.2.2		42				peering1		IXP 1			0A4484
+192.0.2.2		45				peering2		IXP 2			0A7484
+192.0.2.3		6				peering3		IXP 3			4CB4C4

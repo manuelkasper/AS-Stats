@@ -2,7 +2,7 @@
 /*
  * $Id$
  * 
- * (c) 2008 Monzoon Networks AG. All rights reserved.
+ * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
 require_once('func.inc');
