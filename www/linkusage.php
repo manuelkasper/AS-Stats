@@ -45,7 +45,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 </table>
 
 <div id="footer">
-AS-Stats v1 written by Manuel Kasper, Monzoon Networks AG.
+AS-Stats v1.1 written by Manuel Kasper, Monzoon Networks AG.
 </div>
 
 </body>

@@ -144,13 +144,14 @@ sub flush_cache {
 		return;
 	}
 
+	$childrunning = 1;
 	my $pid = fork();
 
 	if (!defined $pid) {
+		$childrunning = 0;
 		print "cannot fork\n";
 	} elsif ($pid != 0) {
 		# in parent
-		$childrunning = 1;
 		$ascache_lastflush = time;
 		$ascache = {};
 		return;

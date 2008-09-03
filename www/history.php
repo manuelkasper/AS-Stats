@@ -55,7 +55,7 @@ AS: <input type="text" name="as" size="6" />
 <?php endif; ?>
 
 <div id="footer">
-AS-Stats v1 written by Manuel Kasper, Monzoon Networks AG.
+AS-Stats v1.1 written by Manuel Kasper, Monzoon Networks AG.
 </div>
 
 </body>

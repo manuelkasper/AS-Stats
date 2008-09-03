@@ -1,7 +1,15 @@
-AS-Stats v1 (2008-02-19)
+AS-Stats v1.1 (2008-09-03)
 a simple tool to generate per-AS traffic graphs from NetFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
+
+Changes
+-------
+v1.1	Fix for a potential race condition surrounding $childrunning
+		(reported by Yann Gauteron; experienced on a Linux system)
+
+v1		Initial release
+
 
 How it works
 ------------
