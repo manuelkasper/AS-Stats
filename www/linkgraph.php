@@ -68,7 +68,7 @@ if ($_GET['height'])
 $knownlinks = getknownlinks();
 
 $cmd = "$rrdtool graph - " .
-	"--slope-mode --alt-autoscale --imgformat=PNG --base=1000 --height=$height --width=$width " .
+	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
 /* geneate RRD DEFs */
@@ -79,8 +79,13 @@ foreach ($topas as $as => $traffic) {
 
 /* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
 foreach ($topas as $as => $traffic) {
-	$cmd .= "CDEF:as{$as}_in_bits=as{$as}_in,8,* ";
-	$cmd .= "CDEF:as{$as}_out_bits_rev=as{$as}_out,-8,* ";
+	if ($outispositive) {
+		$cmd .= "CDEF:as{$as}_in_bits=as{$as}_in,-8,* ";
+		$cmd .= "CDEF:as{$as}_out_bits=as{$as}_out,8,* ";
+	} else {
+		$cmd .= "CDEF:as{$as}_in_bits=as{$as}_in,8,* ";
+		$cmd .= "CDEF:as{$as}_out_bits=as{$as}_out,-8,* ";	
+	}
 }
 
 /* generate graph area/stack for inbound */
@@ -99,7 +104,7 @@ foreach ($topas as $as => $traffic) {
 /* generate graph area/stack for outbound */
 $i = 0;
 foreach ($topas as $as => $traffic) {
-	$cmd .= "AREA:as{$as}_out_bits_rev#{$ascolors[$i]}:";
+	$cmd .= "AREA:as{$as}_out_bits#{$ascolors[$i]}:";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";

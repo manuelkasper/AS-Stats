@@ -5,12 +5,13 @@
  * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
-$rrdpath = "/var/db/netflow/rrd";
-$daystatsfile = "/var/db/netflow/asstats_day.txt";
+$rrdpath = "/data/rrd";
+$daystatsfile = "/data/asstats_day.txt";
 $rrdtool = "/usr/local/bin/rrdtool";
 
 $asinfofile = "asinfo.txt";
-$knownlinksfile = "/etc/netflow-knownlinks";
+$knownlinksfile = "/data/netflow-knownlinks";
+$outispositive = true;
 
 /* note: you might want to put the data from asinfo.txt into an SQL
    database to avoid having to read the whole file all the time */

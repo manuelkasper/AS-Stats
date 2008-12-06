@@ -23,7 +23,7 @@ if ($_GET['height'])
 $knownlinks = getknownlinks();
 
 $cmd = "$rrdtool graph - " .
-	"--slope-mode --alt-autoscale --imgformat=PNG --base=1000 --height=$height --width=$width " .
+	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
 if ($_GET['nolegend'])
@@ -43,14 +43,23 @@ foreach ($knownlinks as $link) {
 
 /* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
 foreach ($knownlinks as $link) {
-	$cmd .= "CDEF:{$link['tag']}_in_bits={$link['tag']}_in,8,* ";
-	$cmd .= "CDEF:{$link['tag']}_out_bits_rev={$link['tag']}_out,-8,* ";
+	if ($outispositive) {
+		$cmd .= "CDEF:{$link['tag']}_in_bits={$link['tag']}_in,-8,* ";
+		$cmd .= "CDEF:{$link['tag']}_out_bits={$link['tag']}_out,8,* ";
+	} else {
+		$cmd .= "CDEF:{$link['tag']}_in_bits={$link['tag']}_in,8,* ";
+		$cmd .= "CDEF:{$link['tag']}_out_bits={$link['tag']}_out,-8,* ";
+	}
 }
 
 /* generate graph area/stack for inbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	$cmd .= "AREA:{$link['tag']}_in_bits#{$link['color']}:\"{$link['descr']}\"";
+	if ($outispositive)
+		$col = $link['color'] . "BB";
+	else
+		$col = $link['color'];
+	$cmd .= "AREA:{$link['tag']}_in_bits#{$col}:\"{$link['descr']}\"";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";
@@ -60,7 +69,11 @@ foreach ($knownlinks as $link) {
 /* generate graph area/stack for outbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	$cmd .= "AREA:{$link['tag']}_out_bits_rev#{$link['color']}BB:";
+	if ($outispositive)
+		$col = $link['color'];
+	else
+		$col = $link['color'] . "BB";
+	$cmd .= "AREA:{$link['tag']}_out_bits#{$col}:";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";

@@ -1,10 +1,13 @@
-AS-Stats v1.1 (2008-09-03)
+AS-Stats v1.2 (2008-12-06)
 a simple tool to generate per-AS traffic graphs from NetFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
+v1.2	Allow inbound/outbound in graphs to be swapped (via option
+		in www/func.inc)
+
 v1.1	Fix for a potential race condition surrounding $childrunning
 		(reported by Yann Gauteron; experienced on a Linux system)
 
@@ -81,8 +84,6 @@ Installation
 
 		ip flow-cache timeout active 5
 		
-		! enable ip flow ingress on all interfaces listed in your
-		! "known links" file
 		int Gi0/x.y
 		  ip flow ingress
 		  
