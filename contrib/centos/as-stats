@@ -1,0 +1,80 @@
+#! /bin/bash
+#
+# as-stats - Start/Stop the as-stats NetFlow collector.
+#
+# chkconfig: 2345 90 10
+# description: as-stats is a program that collects NetFlow data
+#              and process it in order to show the different 
+#              sourced / destinated IP traffic AS.
+
+# Source function library.
+. /etc/init.d/functions
+
+DAEMON=netflow-asstatd.pl
+RRDDIR=/data/as-stats/rrd
+KNOWNLINKS=/data/as-stats/etc/netflow-knownlinks
+
+prog="as-stats"
+
+start() {
+        echo -n $"Starting $prog: "
+
+        # start daemon
+        daemon /data/as-stats/bin/$DAEMON $RRDDIR $KNOWNLINKS >> /data/as-stats/output.log &
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && touch /var/lock/subsys/as-stats
+	return $RETVAL
+}
+
+stop() {
+        echo -n $"Stopping $prog: "
+        
+        # stop daemon
+        killproc $DAEMON
+        RETVAL=$?
+        echo
+        [ $RETVAL = 0 ] && rm -f /var/lock/subsys/as-stats
+        return $RETVAL
+}       
+
+restart() {
+        stop
+        start
+}       
+
+reload() {
+        echo -n $"Reloading $prog daemon configuration: "
+        killproc $DAEMON -HUP
+        RETVAL=$?
+        echo
+        return $RETVAL
+}       
+
+rhstatus() {
+	status $DAEMON
+}
+
+case "$1" in
+  start)
+        start
+        ;;
+  stop)
+        stop
+        ;;
+  restart)
+        restart
+        ;;
+  reload)
+        reload
+        ;;
+  status)
+        rhstatus
+        ;;
+  *)
+        echo $"Usage: $0 {start|stop|status|reload|restart}"
+        exit 1
+esac
+
+exit $RETVAL
+

@@ -8,7 +8,7 @@
 require_once('func.inc');
 
 $as = $_GET['as'];
-if (!preg_match("/^[0-9a-z]+$/", $as))
+if (!preg_match("/^[0-9a-zA-Z]+$/", $as))
 	die("Invalid AS");
 
 header("Content-Type: image/png");

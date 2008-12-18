@@ -5,7 +5,9 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
-v1.2	Allow inbound/outbound in graphs to be swapped (via option
+v1.2	Support for sFlow (through sflow-asstatd.pl); fix for link names
+		with upper-case characters
+		Allow inbound/outbound in graphs to be swapped (via option
 		in www/func.inc)
 
 v1.1	Fix for a potential race condition surrounding $childrunning
