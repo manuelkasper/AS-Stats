@@ -21,6 +21,8 @@ if (! -d $rrdpath) {
 
 my %knownlinks;
 
+my $samplingrate = 1;	# rate for sampled NetFlow (or = 1 for unsampled)
+
 my $ascache = {};
 my $ascache_lastflush = 0;
 my $ascache_flush_interval = 60;
@@ -168,7 +170,7 @@ sub flush_cache {
 			next if ($dsname !~ /_(in|out)$/);
 			
 			push(@templatearg, $dsname);
-			push(@args, $value);
+			push(@args, $value * $samplingrate);
 		}
 		
 	 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
