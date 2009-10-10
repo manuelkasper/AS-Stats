@@ -48,7 +48,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 	<th>
 		<div class="title">
 			<?php
-			$flagfile = "flags/f0-" . strtolower($asinfo['country']) . ".gif";
+			$flagfile = "flags/" . strtolower($asinfo['country']) . ".gif";
 			if (file_exists($flagfile)):
 				$is = getimagesize($flagfile);
 			?>
@@ -90,7 +90,7 @@ foreach ($knownlinks as $link) {
 </div>
 
 <div id="footer">
-AS-Stats v1.2 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.3 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

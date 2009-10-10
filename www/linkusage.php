@@ -37,7 +37,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 	</th>
 	<td>
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&width=500&height=300" width="581" height="494" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300" width="581" height="494" border="0" />
 	</td>
 </tr>
 <?php $i++; endforeach; ?>
@@ -45,7 +45,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 </table>
 
 <div id="footer">
-AS-Stats v1.2 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.3 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

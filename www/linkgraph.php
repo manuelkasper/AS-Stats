@@ -8,9 +8,6 @@
 require_once('func.inc');
 
 $numtop = 10;
-if ($_GET['numtop'] && $_GET['numtop'] <= 50)
-	$numtop = $_GET['numtop'];
-
 $ascolors = array("D41C0E", "E45605", "FECF12", "2FA11C", "19BB7C", "0A4484", "0A7484", "4CB4C4", "971928", "1f348c");
 
 $link = $_GET['link'];
@@ -73,8 +70,9 @@ $cmd = "$rrdtool graph - " .
 
 /* geneate RRD DEFs */
 foreach ($topas as $as => $traffic) {
-	$cmd .= "DEF:as{$as}_in=\"$rrdpath/$as.rrd\":{$link}_in:AVERAGE ";
-	$cmd .= "DEF:as{$as}_out=\"$rrdpath/$as.rrd\":{$link}_out:AVERAGE ";
+	$rrdfile = getRRDFileForAS($as);
+	$cmd .= "DEF:as{$as}_in=\"$rrdfile\":{$link}_in:AVERAGE ";
+	$cmd .= "DEF:as{$as}_out=\"$rrdfile\":{$link}_out:AVERAGE ";
 }
 
 /* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */

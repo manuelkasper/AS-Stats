@@ -5,13 +5,7 @@
  * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
-$rrdpath = "/data/rrd";
-$daystatsfile = "/data/asstats_day.txt";
-$rrdtool = "/usr/local/bin/rrdtool";
-
-$asinfofile = "asinfo.txt";
-$knownlinksfile = "/data/netflow-knownlinks";
-$outispositive = true;
+require_once('config.inc');
 
 /* note: you might want to put the data from asinfo.txt into an SQL
    database to avoid having to read the whole file all the time */
@@ -134,6 +128,11 @@ function format_bytes($bytes) {
 		return sprintf("%d KB", $bytes / 1024);
 	else
 		return "$bytes bytes";
+}
+
+function getRRDFileForAS($as) {
+	global $rrdpath;
+	return "$rrdpath/" . sprintf("%02x", $as % 256) . "/$as.rrd";
 }
 
 ?>

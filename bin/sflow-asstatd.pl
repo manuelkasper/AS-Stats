@@ -8,21 +8,10 @@ use strict;
 use Net::sFlow;
 use IO::Socket;
 use RRDs;
-
-if ($#ARGV != 1) {
-	die("Usage: $0 <path to RRD file directory> <path to known links file>\n");
-}
-
-my $rrdpath = $ARGV[0];
-my $knownlinksfile = $ARGV[1];
-
-if (! -d $rrdpath) {
-	die("$rrdpath does not exist or is not a directory\n");
-}
+use Getopt::Std;
 
 my %knownlinks;
 
-my $myas = 8302;
 my $samplingrate = 512;
 
 my $ascache = {};
@@ -35,10 +24,41 @@ my $header_len = 28;
 my $flowrec_len = 28;
 my $childrunning = 0;
 
+use vars qw/ %opt /;
+getopts('r:p:k:a:s:', \%opt);
+
+my $usage = "$0 [-rpkas]\n".
+	"\t-r <path to RRD files>\n".
+	"\t(-p <UDP listen port - default $server_port>)\n".
+	"\t-k <path to known links file>\n".
+	"\t-a <your own AS number>\n".
+	"\t(-s <sampling rate - default $samplingrate>)\n";
+
+my $rrdpath = $opt{'r'};
+my $knownlinksfile = $opt{'k'};
+my $myas = $opt{'a'};
+
+die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile) || !defined($myas));
+
+die("$rrdpath does not exist or is not a directory\n") if ! -d $rrdpath;
+die("$knownlinksfile does not exist or is not a file\n") if ! -f $knownlinksfile;
+die("Your own AS number is non numeric\n") if ($myas !~ /^[0-9]+$/);
+
+if (defined($opt{'s'})) {
+	$samplingrate = $opt{'s'};
+	die("Sampling rate is non numeric\n") if $samplingrate !~ /^[0-9]+$/;
+}
+
+if (defined($opt{'p'})) {
+	$server_port = $opt{'p'};
+	die("Server port is non numeric\n") if $server_port !~ /^[0-9]+$/;
+}
+
 # reap dead children
 $SIG{CHLD} = \&REAPER;
 $SIG{TERM} = \&TERM;
 $SIG{INT} = \&TERM;
+$SIG{HUP} = \&read_knownlinks;
 
 sub REAPER {
 	wait;
@@ -234,8 +254,17 @@ sub getrrdfile {
 	my $startts = shift;
 	$startts--;
 
+	# we create 256 directories and store RRD files based on the lower
+	# 8 bytes of the AS number
+	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
+	if (! -d $dirname) {
+		# need to create directory
+		mkdir($dirname);
+	}
+	
+	my $rrdfile = "$dirname/$as.rrd";
+
 	# let's see if there's already an RRD file for this AS - if not, create one
-	my $rrdfile = "$rrdpath/$as.rrd";
 	if (! -r $rrdfile) {
 		#print "$$: creating RRD file for AS $as\n";
 		
@@ -260,13 +289,17 @@ sub getrrdfile {
 }
 
 sub read_knownlinks {
+	my %knownlinks_tmp;
 	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile!");
 	while (<KLFILE>) {
 		chomp;
 		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
 		
 		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
-		$knownlinks{"${routerip}_${ifindex}"} = $tag;
+		$knownlinks_tmp{"${routerip}_${ifindex}"} = $tag;
 	}
 	close(KLFILE);
+	
+	%knownlinks = %knownlinks_tmp;
+	return;
 }

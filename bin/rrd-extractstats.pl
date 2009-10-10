@@ -3,9 +3,11 @@
 # $Id$
 #
 # written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
+# mod for rrd path sjc
 
 use strict;
 use RRDs;
+use File::Find;
 
 if ($#ARGV != 2) {
 	die("Usage: $0 <path to RRD file directory> <path to known links file> outfile\n");
@@ -24,16 +26,19 @@ my @links = values %knownlinks;
 # walk through all RRD files in the given path and extract stats for all links
 # from them; write the stats to a text file, sorted by total traffic
 
-opendir(DIR, $rrdpath);
-my @rrdfiles = readdir(DIR);
-closedir(DIR);
+my @rrdfiles;
+find(sub {
+	if (-f $_) {
+		push(@rrdfiles, $File::Find::name);
+	}
+}, $rrdpath);
 
 my $astraffic = {};
 
 $|=1;
 my $i = 0;
 foreach my $rrdfile (@rrdfiles) {
-	if ($rrdfile =~ /^(\d+).rrd$/) {
+	if ($rrdfile =~ /\/(\d+).rrd$/) {
 		my $as = $1;
 		
 		$astraffic->{$as} = gettraffic($as, time - 86400, time);
@@ -94,9 +99,12 @@ sub gettraffic {
 	
 	my $retdata = {};
 	
+	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
+	my $rrdfile = "$dirname/$as.rrd";
+	
 	foreach my $link (@links) {
-		push(@cmd, "DEF:${link}_in=$rrdpath/$as.rrd:${link}_in:AVERAGE");
-		push(@cmd, "DEF:${link}_out=$rrdpath/$as.rrd:${link}_out:AVERAGE");
+		push(@cmd, "DEF:${link}_in=$rrdfile:${link}_in:AVERAGE");
+		push(@cmd, "DEF:${link}_out=$rrdfile:${link}_out:AVERAGE");
 		push(@cmd, "VDEF:${link}_in_v=${link}_in,TOTAL");
 		push(@cmd, "VDEF:${link}_out_v=${link}_out,TOTAL");
 		push(@cmd, "PRINT:${link}_in_v:%lf");
@@ -142,3 +150,4 @@ sub read_knownlinks {
 	}
 	close(KLFILE);
 }
+

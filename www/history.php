@@ -5,11 +5,15 @@
  * written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
  */
 
+error_reporting(0);
+
 require_once('func.inc');
 
 $as = $_GET['as'];
 if ($as)
 	$asinfo = getASInfo($as);
+
+$rrdfile = getRRDFileForAS($as);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -29,7 +33,7 @@ if ($as)
 <?php if ($as): ?>
 <div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></div>
 
-<?php if (!file_exists("$rrdpath/$as.rrd")): ?>
+<?php if (!file_exists($rrdfile)): ?>
 <p>No data found for AS <?php echo $as; ?></p>
 <?php else: ?>
 <div class="title">Daily</div>
@@ -55,7 +59,7 @@ AS: <input type="text" name="as" size="6" />
 <?php endif; ?>
 
 <div id="footer">
-AS-Stats v1.2 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.3 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

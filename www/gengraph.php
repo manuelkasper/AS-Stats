@@ -21,6 +21,7 @@ if ($_GET['height'])
 	$height = (int)$_GET['height'];
 
 $knownlinks = getknownlinks();
+$rrdfile = getRRDFileForAS($as);
 
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
@@ -37,8 +38,8 @@ if ($_GET['end'] && is_numeric($_GET['end']))
 
 /* geneate RRD DEFs */
 foreach ($knownlinks as $link) {
-	$cmd .= "DEF:{$link['tag']}_in=\"$rrdpath/$as.rrd\":{$link['tag']}_in:AVERAGE ";
-	$cmd .= "DEF:{$link['tag']}_out=\"$rrdpath/$as.rrd\":{$link['tag']}_out:AVERAGE ";
+	$cmd .= "DEF:{$link['tag']}_in=\"$rrdfile\":{$link['tag']}_in:AVERAGE ";
+	$cmd .= "DEF:{$link['tag']}_out=\"$rrdfile\":{$link['tag']}_out:AVERAGE ";
 }
 
 /* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
