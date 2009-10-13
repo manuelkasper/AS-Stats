@@ -5,6 +5,10 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+xxxx	Allow NetFlow aggregation version 0 as well as 2 to make NetFlow
+		exports from Juniper routers work (suggested by Thomas Mangin
+     	<thomas.mangin@exa-networks.co.uk>).
+
 v1.3	Changes by Steve Colam <steve@colam.co.uk>:
 			- ...-asstatd.pl now accepts parameters (UDP listen port,
 			  sampling rate etc.) on the command line

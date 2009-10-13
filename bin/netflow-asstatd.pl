@@ -88,7 +88,7 @@ while (1) {
 	  $flow_sequence, $engine_type, $engine_id, $aggregation,
 	  $agg_version) = unpack("nnNNNNCCCC", $datagram);
 
-	if ($version != 8 || $aggregation != 1 || $agg_version != 2) {
+	if ($version != 8 || $aggregation != 1 || ($agg_version != 0 && $agg_version != 2)) {
 		print "unknown version: $version/$aggregation/$agg_version\n";
 		next;
 	}
