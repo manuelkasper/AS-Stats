@@ -7,6 +7,9 @@
 
 require_once('config.inc');
 
+/* make sure we have enough memory, as some pages can be quite memory intensive */
+ini_set("memory_limit", "256M");
+
 /* note: you might want to put the data from asinfo.txt into an SQL
    database to avoid having to read the whole file all the time */
 function getASInfo($asnum) {
