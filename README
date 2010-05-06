@@ -1,11 +1,11 @@
-AS-Stats v1.3 (2009-10-10)
+AS-Stats v1.31 (2010-05-06)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-xxxx	Set memory_limit to 256 MB in PHP pages (suggested by Steve Colam
+v1.31	Set memory_limit to 256 MB in PHP pages (suggested by Steve Colam
 		<steve@colam.co.uk>).
 		
 		Allow NetFlow aggregation version 0 as well as 2 to make NetFlow
