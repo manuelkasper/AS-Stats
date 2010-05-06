@@ -12,6 +12,8 @@ v1.31	Set memory_limit to 256 MB in PHP pages (suggested by Steve Colam
 		exports from Juniper routers work (suggested by Thomas Mangin
      	<thomas.mangin@exa-networks.co.uk>).
 
+		Updated asinfo.txt with data from whois.cymru.com.
+
 v1.3	Changes by Steve Colam <steve@colam.co.uk>:
 			- ...-asstatd.pl now accepts parameters (UDP listen port,
 			  sampling rate etc.) on the command line
