@@ -5,6 +5,9 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+v1.xx   Fix add_ds.sh to support new directory structure
+		(contributed by Sergei Veltistov)
+
 v1.31	Set memory_limit to 256 MB in PHP pages (suggested by Steve Colam
 		<steve@colam.co.uk>).
 		
