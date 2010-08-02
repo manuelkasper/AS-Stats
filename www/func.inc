@@ -21,14 +21,14 @@ function getASInfo($asnum) {
 	if ($asinfodb[$asnum])
 		return $asinfodb[$asnum];
 	else
-		return array(name => "AS$asnum", descr => "AS $asnum");
+		return array('name' => "AS$asnum", 'descr' => "AS $asnum");
 	
 	/*$row = mysql_fetch_array(mysql_query("select * from asnums where asn='" . addslashes($asnum) . "'"));
 	
 	if ($row) {
-		return array(name => $row['asname'], descr => $row['descr'], country => $row['country']);
+		return array('name' => $row['asname'], 'descr' => $row['descr'], 'country' => $row['country']);
 	} else {
-		return array(name => "AS$asnum", descr => "AS $asnum");
+		return array('name' => "AS$asnum", 'descr' => "AS $asnum");
 	}*/
 }
 
@@ -45,12 +45,16 @@ function readasinfodb() {
 		if (preg_match("/(^\\s*#)|(^\\s*$)/", $line))
 			continue;	/* empty line or comment */
 		
-		list($asn,$asname,$descr,$country) = explode("\t", $line);
+		$asnarr = explode("\t", $line);
+		$asn = $asnarr[0];
+		$asname = $asnarr[1];
+		$descr = $asnarr[2];
+		if (isset($asnarr[3])) $country = $asnarr[3];
 		
 		$asinfodb[$asn] = array(
-			name => $asname,
-			descr => $descr,
-			country => $country
+			'name' => $asname,
+			'descr' => $descr,
+			'country' => $country
 		);
 	}
 	fclose($fd);
@@ -60,7 +64,7 @@ function readasinfodb() {
 
 function getknownlinks() {
 	global $knownlinksfile;
-	
+
 	$fd = fopen($knownlinksfile, "r");
 	$knownlinks = array();
 	while (!feof($fd)) {
@@ -71,11 +75,11 @@ function getknownlinks() {
 		list($routerip,$ifindex,$tag,$descr,$color) = preg_split("/\\t+/", $line);
 		
 		$knownlinks[] = array(
-			routerip => $routerip,
-			ifindex => $ifindex,
-			tag => $tag,
-			descr => $descr,
-			color => $color
+			'routerip' => $routerip,
+			'ifindex' => $ifindex,
+			'tag' => $tag,
+			'descr' => $descr,
+			'color' => $color
 		);
 	}
 	fclose($fd);

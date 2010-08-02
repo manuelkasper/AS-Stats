@@ -10,4 +10,6 @@ $asinfofile = "asinfo.txt";
 $knownlinksfile = "/data/knownlinks";
 $outispositive = true;
 
+$ntop = 20;
+
 ?>

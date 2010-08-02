@@ -15,9 +15,9 @@ header("Content-Type: image/png");
 
 $width = 500;
 $height = 300;
-if ($_GET['width'])
+if (isset($_GET['width']))
 	$width = (int)$_GET['width'];
-if ($_GET['height'])
+if (isset($_GET['height']))
 	$height = (int)$_GET['height'];
 
 $knownlinks = getknownlinks();
@@ -27,13 +27,13 @@ $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
-if ($_GET['nolegend'])
+if (isset($_GET['nolegend']))
 	$cmd .= "--no-legend ";
 
-if ($_GET['start'] && is_numeric($_GET['start']))
+if (isset($_GET['start']) && is_numeric($_GET['start']))
 	$cmd .= "--start " . $_GET['start'] . " ";
 
-if ($_GET['end'] && is_numeric($_GET['end']))
+if (isset($_GET['end']) && is_numeric($_GET['end']))
 	$cmd .= "--end " . $_GET['end'] . " ";
 
 /* geneate RRD DEFs */

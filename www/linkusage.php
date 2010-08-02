@@ -45,7 +45,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 </table>
 
 <div id="footer">
-AS-Stats v1.31 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.32 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>
