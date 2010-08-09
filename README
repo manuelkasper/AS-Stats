@@ -5,6 +5,10 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+xxx		Fix for multiple entries with the same tag in the
+		knownlinks file (e.g. for LACP)
+		(contributed by Michal Buchtik)
+
 v1.32   Fix add_ds.sh to support new directory structure
 		(contributed by Sergei Veltistov)
 		

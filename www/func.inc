@@ -73,14 +73,21 @@ function getknownlinks() {
 			continue;	/* empty line or comment */
 		
 		list($routerip,$ifindex,$tag,$descr,$color) = preg_split("/\\t+/", $line);
-		
-		$knownlinks[] = array(
+
+		$known = false;
+		foreach ($knownlinks as $link) {
+		    if (in_array($tag,$link)) {$known=true;}
+		}
+
+		if (!$known) {
+		    $knownlinks[] = array(
 			'routerip' => $routerip,
 			'ifindex' => $ifindex,
 			'tag' => $tag,
 			'descr' => $descr,
 			'color' => $color
-		);
+		    );
+		}
 	}
 	fclose($fd);
 	
