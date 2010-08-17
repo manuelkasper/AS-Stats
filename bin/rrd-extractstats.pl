@@ -146,7 +146,13 @@ sub read_knownlinks {
 		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
 		
 		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
-		$knownlinks{"${routerip}_${ifindex}"} = $tag;
+		my $known = 0;
+		foreach my $link (values %knownlinks) {
+			if ($tag =~ $link) { $known=1; last; }
+		}
+		if ($known == 0) {
+			$knownlinks{"${routerip}_${ifindex}"} = $tag;
+		}
 	}
 	close(KLFILE);
 }
