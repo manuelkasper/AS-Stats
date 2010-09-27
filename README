@@ -8,6 +8,11 @@ Changes
 xxx		Fix for multiple entries with the same tag in the
 		knownlinks file (e.g. for LACP)
 		(contributed by Michal Buchtik)
+		
+		Added sync_ds.pl script to contrib directory, which can
+		synchronize the data sources of RRD files with the tags
+		defined in the knownlinks file
+		(contributed by Michal Buchtik)
 
 v1.32   Fix add_ds.sh to support new directory structure
 		(contributed by Sergei Veltistov)
