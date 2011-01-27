@@ -59,7 +59,7 @@ AS: <input type="text" name="as" size="6" />
 <?php endif; ?>
 
 <div id="footer">
-AS-Stats v1.32 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.33 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>
