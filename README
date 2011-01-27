@@ -1,11 +1,11 @@
-AS-Stats v1.32 (2010-08-02)
+AS-Stats v1.33 (2011-01-27)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-xxx		Fix for multiple entries with the same tag in the
+v1.33	Fix for multiple entries with the same tag in the
 		knownlinks file (e.g. for LACP)
 		(contributed by Michal Buchtik)
 		
@@ -13,6 +13,11 @@ xxx		Fix for multiple entries with the same tag in the
 		synchronize the data sources of RRD files with the tags
 		defined in the knownlinks file
 		(contributed by Michal Buchtik)
+		
+		sflow-asstatd.pl now uses the agent IP instead of the
+		UDP source address - this makes it behave properly when
+		a proxy is being used
+		(contributed by Michel Moriniaux)
 
 v1.32   Fix add_ds.sh to support new directory structure
 		(contributed by Sergei Veltistov)

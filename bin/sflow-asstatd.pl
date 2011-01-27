@@ -94,6 +94,11 @@ while (1) {
 		print "Warning: non-v5 packet received - not supported\n";
 		next;
 	}
+
+	# use agent IP if available (in case of proxy)
+	if ($sFlowDatagramRef->{'AgentIp'}) {
+		$ipaddr = inet_aton($sFlowDatagramRef->{'AgentIp'});
+	}
 	
 	foreach my $sFlowSample (@{$sFlowSamplesRef}) {
 		# only process standard structures
