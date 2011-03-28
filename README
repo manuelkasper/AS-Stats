@@ -5,6 +5,15 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+xxx		Fix for NaN detection in rrd-extractstats.pl for
+		64-bit Perl versions
+		(contributed by Benjamin Schlageter)
+		
+		Skip missing data sources in rrd-extractstats.pl to avoid
+		abort if new data sources are added but the RRDs are not
+		updated.
+
+
 v1.33	Fix for multiple entries with the same tag in the
 		knownlinks file (e.g. for LACP)
 		(contributed by Michal Buchtik)

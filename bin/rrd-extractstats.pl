@@ -102,7 +102,18 @@ sub gettraffic {
 	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
 	my $rrdfile = "$dirname/$as.rrd";
 	
+	# get list of available DS
+	my $availableds = {};
+	my $rrdinfo = RRDs::info($rrdfile);
+	foreach my $ri (keys %$rrdinfo) {
+		if ($ri =~ /^ds\[(.+)\]\.type$/) {
+			$availableds->{$1} = 1;
+		}
+	}
+	
 	foreach my $link (@links) {
+		next if (!$availableds->{"${link}_in"} || !$availableds->{"${link}_out"});
+		
 		push(@cmd, "DEF:${link}_in=$rrdfile:${link}_in:AVERAGE");
 		push(@cmd, "DEF:${link}_out=$rrdfile:${link}_out:AVERAGE");
 		push(@cmd, "VDEF:${link}_in_v=${link}_in,TOTAL");
@@ -122,13 +133,13 @@ sub gettraffic {
 	for (my $i = 0; $i < scalar(@links); $i++) {
 		my $in = $lines->[$i*2];
 		chomp($in);
-		if ($in eq "nan") {
+		if (isnan($in)) {
 			$in = 0;
 		}
 		
 		my $out = $lines->[$i*2+1];
 		chomp($out);
-		if ($out eq "nan") {
+		if (isnan($out)) {
 			$out = 0;
 		}
 		
@@ -157,3 +168,4 @@ sub read_knownlinks {
 	close(KLFILE);
 }
 
+sub isnan { ! defined( $_[0] <=> 9**9**9 ) }
