@@ -1,11 +1,11 @@
-AS-Stats v1.33 (2011-01-27)
+AS-Stats v1.34 (2011-04-26)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-xxx		Fix for NaN detection in rrd-extractstats.pl for
+v1.34	Fix for NaN detection in rrd-extractstats.pl for
 		64-bit Perl versions
 		(contributed by Benjamin Schlageter)
 		
