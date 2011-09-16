@@ -173,8 +173,12 @@ sFlow data.
 		ip flow-export version 5 origin-as
 		ip flow-aggregation cache as
 		 cache timeout active 5
+		 cache entries 16384
 		 export destination <IP address of server running AS stats> 9000
-		 enabled  
+		 enabled
+
+  Adjust the number of cache entries if necessary (i.e. if you get messages
+  like "Netflow as aggregation cache is almost full" in the logs).
 
   Note that the version has to be specified as 5, even though the AS
   aggregation records will actually be v8. Also, setting the global flow
@@ -183,6 +187,15 @@ sFlow data.
   the cache. Decreasing the flow-cache timeout may result in a slight
   increase in CPU usage (and NetFlow AS aggregation takes its fair share of
   CPU as well, of course).
+
+  Routers with MLS (Multi-Layer Switching, e.g. Cisco 7600 series) require
+  additional commands like the following in order to enable NetFlow
+  processing/aggregation for packets processed in hardware:
+
+		mls aging fast time 4 threshold 2
+		mls aging long 128
+		mls aging normal 64
+		mls flow ip interface-full
 
 - sFlow only:
   Have your router(s) send sFlow samples to your machine. Your routers
