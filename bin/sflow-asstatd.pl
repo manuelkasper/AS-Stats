@@ -16,7 +16,8 @@ my $samplingrate = 512;
 
 my $ascache = {};
 my $ascache_lastflush = 0;
-my $ascache_flush_interval = 60;
+my $ascache_flush_interval = 25;
+my $ascache_flush_number = 0;
 
 my $server_port = 6343;
 my $MAXREAD = 8192;
@@ -223,29 +224,36 @@ sub flush_cache {
 		# in parent
 		$childrunning = 1;
 		$ascache_lastflush = time;
-		$ascache = {};
+		for (keys %$ascache) {
+			if ($_ % 10 == $ascache_flush_number % 10) {
+				delete $ascache->{$_};
+			}
+		}
+		$ascache_flush_number++;
 		return;
 	}
 
 	while (my ($as, $cacheent) = each(%$ascache)) {
-		print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
+		if ($as % 10 == $ascache_flush_number % 10) {
+			print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
 		
-		my $rrdfile = getrrdfile($as, $cacheent->{updatets});
-		my @templatearg;
-		my @args;
+			my $rrdfile = getrrdfile($as, $cacheent->{updatets});
+			my @templatearg;
+			my @args;
 		
-		while (my ($dsname, $value) = each(%$cacheent)) {
-			next if ($dsname !~ /_(in|out)$/);
+			while (my ($dsname, $value) = each(%$cacheent)) {
+				next if ($dsname !~ /_(in|out)$/);
 			
-			push(@templatearg, $dsname);
-			push(@args, $value * $samplingrate);
-		}
+				push(@templatearg, $dsname);
+				push(@args, $value * $samplingrate);
+			}
 		
-	 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
-	 		$cacheent->{updatets} . ":" . join(':', @args));
-	 	my $ERR = RRDs::error;
-		if ($ERR) {
-			print "Error updating RRD file $rrdfile: $ERR\n";
+		 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
+		 		$cacheent->{updatets} . ":" . join(':', @args));
+		 	my $ERR = RRDs::error;
+			if ($ERR) {
+				print "Error updating RRD file $rrdfile: $ERR\n";
+			}
 		}
 	}
 	

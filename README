@@ -1,12 +1,17 @@
-AS-Stats v1.34 (2011-04-26)
+AS-Stats v1.35 (2012-04-19)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-xxx		Allow hyphens in link names.
+v1.35	Allow hyphens in link names.
 		(contributed by Gareth Campling)
+		
+		Smooth I/O burstiness and reduce overall IOPS requirements
+		by flushing only 10% of the cache every 25 seconds (instead
+		of the entire cache at once every 60 seconds).
+		(contributed by James A. T. Rice)
 
 
 v1.34	Fix for NaN detection in rrd-extractstats.pl for
