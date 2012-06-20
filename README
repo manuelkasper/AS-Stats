@@ -5,6 +5,11 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+vx.x	Fix creation of new RRDs when multiple entries with the same
+		tag are present in the known links file
+		(spotted by Michel Moriniaux)
+
+
 v1.35	Allow hyphens in link names.
 		(contributed by Gareth Campling)
 		

@@ -232,8 +232,10 @@ sub getrrdfile {
 	if (! -r $rrdfile) {
 		#print "$$: creating RRD file for AS $as\n";
 		
+		my %links = map { $_, 1 } values %knownlinks;
+		
 		my @args;
-		while (my ($key, $alias) = each(%knownlinks)) {
+		foreach my $alias (keys %links) {
 			push(@args, "DS:${alias}_in:ABSOLUTE:300:U:U");
 			push(@args, "DS:${alias}_out:ABSOLUTE:300:U:U");
 		}
