@@ -22,7 +22,7 @@ $knownlinks = getknownlinks();
 
 <body>
 
-<div id="nav"><a href="top.php">Top AS</a> | <a href="history.php">View an AS</a> | Link usage</div>
+<div id="nav"><a href="top.php">Top AS</a> | <a href="history.php">View an AS</a> | <a href="asset.php">View an AS-SET</a> | Link usage</div>
 <div class="pgtitle">Link usage - top 10 AS per link</div>
 
 <table class="astable">
@@ -45,7 +45,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 </table>
 
 <div id="footer">
-AS-Stats v1.35 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

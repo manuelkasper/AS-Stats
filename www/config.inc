@@ -12,4 +12,7 @@ $outispositive = true;
 
 $ntop = 20;
 
+$whois = "/usr/bin/whois";
+$assetpath = "asset";
+$asset_cache_life ="604800"; # 604800 seconds = 7 days
 ?>

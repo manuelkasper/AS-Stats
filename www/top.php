@@ -32,7 +32,7 @@ $topas = getasstats_top($ntop);
 Number of AS: 
 <input type="text" name="n" size="4" value="<?php echo $ntop; ?>" />
 <input type="submit" value="Go" style="margin-right: 2em" />
-Top AS | <a href="history.php">View an AS</a> | <a href="linkusage.php">Link usage</a></form>
+Top AS | <a href="history.php">View an AS</a> | <a href="asset.php">View an AS-SET</a> | <a href="linkusage.php">Link usage</a></form>
 </div>
 <div class="pgtitle">Top <?php echo $ntop; ?> AS</div>
 
@@ -88,7 +88,7 @@ foreach ($knownlinks as $link) {
 </div>
 
 <div id="footer">
-AS-Stats v1.35 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

@@ -28,7 +28,7 @@ $rrdfile = getRRDFileForAS($as);
 
 <body>
 
-<div id="nav"><a href="top.php">Top AS</a> | View an AS | <a href="linkusage.php">Link usage</a></div>
+<div id="nav"><a href="top.php">Top AS</a> | View an AS | <a href="asset.php">View an AS-SET</a> | <a href="linkusage.php">Link usage</a></div>
 
 <?php if ($as): ?>
 <div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></div>
@@ -59,7 +59,7 @@ AS: <input type="text" name="as" size="6" />
 <?php endif; ?>
 
 <div id="footer">
-AS-Stats v1.35 written by Manuel Kasper, Monzoon Networks AG.<br/>
+AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

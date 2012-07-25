@@ -1,13 +1,19 @@
-AS-Stats v1.35 (2012-04-19)
+AS-Stats v1.36 (2012-07-25)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-vx.x	Fix creation of new RRDs when multiple entries with the same
+v1.36	Fix creation of new RRDs when multiple entries with the same
 		tag are present in the known links file
 		(spotted by Michel Moriniaux)
+		
+		Add feature to inspect all ASes in an AS-SET (automatic whois
+		lookup).
+		(contributed by Nicolas Debrigode)
+		
+		Updated asinfo.txt with data from whois.cymru.com.
 
 
 v1.35	Allow hyphens in link names.
@@ -234,6 +240,9 @@ sFlow data.
   
 - Copy the contents of the "www" directory to somewhere within your web
   server's document root and change file paths in config.inc as necessary.
+
+- Make the directory "asset" within www writable by the web server (this
+  is used to cache AS-SETs and avoid having to query whois for every request).
 
 - Wait a few hours for data to accumulate. :)
 

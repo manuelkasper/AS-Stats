@@ -149,4 +149,59 @@ function getRRDFileForAS($as) {
 	return "$rrdpath/" . sprintf("%02x", $as % 256) . "/$as.rrd";
 }
 
+function getASSET($asset) {
+	global $whois, $assetpath, $asset_cache_life;
+	
+	/* sanity check */
+	if (!preg_match("/^[a-zA-Z0-9:_-]+$/", $asset))
+		return null;
+
+	$assetfile = $assetpath."/".$asset.".txt";
+
+	# check if file exist and cache
+	$filemtime = @filemtime($assetfile);	
+	if (!$filemtime or (time() - $filemtime >= $asset_cache_life)) {
+        $cmd = $whois ." -h whois.radb.net '!i".$asset."'";
+
+        $return_aslist = explode("\n",shell_exec($cmd));
+        $aslist = explode(" ",$return_aslist[1]);
+    
+        $f = fopen($assetfile,"w");
+        foreach ($aslist as $as) {
+            fputs($f,$as."\n");
+        }
+        fclose($f);
+	# else read cache file
+	} else {
+		$f = fopen($assetfile, "r");
+    	$aslist = array();
+
+		while (!feof($f)) {
+			$line = trim(fgets($f));
+			if (!empty($line))
+				$aslist[] = $line;
+		}
+	}
+
+	return $aslist;
+}
+
+function clearCacheFileASSET($asset) {
+	global $assetpath;
+	
+	/* sanity check */
+	if (!preg_match("/^[a-zA-Z0-9:_-]+$/", $asset))
+		return;
+
+	if ( $asset == "all" ) {
+		$files = glob($assetpath."/*.txt");
+		foreach($files as $file) {
+			unlink($file);
+		}
+	} else {
+		$file = $assetpath."/".$asset.".txt";
+		unlink($file);
+	}
+}
+
 ?>
