@@ -5,6 +5,10 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+vx.xx	Add links to PeeringDB and robtex
+		(suggested by Steve Glendinning)
+
+
 v1.36	Fix creation of new RRDs when multiple entries with the same
 		tag are present in the known links file
 		(spotted by Michel Moriniaux)

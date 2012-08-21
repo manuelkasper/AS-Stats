@@ -56,6 +56,19 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 		<div class="small">~ <?php echo format_bytes($nbytes[0]); ?> in / 
 			<?php echo format_bytes($nbytes[1]); ?> out in the last 24 hours</div>
+
+<?php if (!empty($customlinks)): ?>
+		<div class="customlinks">
+<?php 
+$htmllinks = array();
+foreach ($customlinks as $linkname => $url) {
+	$url = str_replace("%as%", $as, $url);
+	$htmllinks[] = "<a href=\"$url\" target=\"_blank\">" . htmlspecialchars($linkname) . "</a>\n";
+}
+echo join(" | ", $htmllinks);
+?>
+		</div>
+<?php endif; ?>
 		
 		<div class="rank">
 			#<?php echo ($i+1); ?>

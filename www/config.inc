@@ -15,4 +15,12 @@ $ntop = 20;
 $whois = "/usr/bin/whois";
 $assetpath = "asset";
 $asset_cache_life ="604800"; # 604800 seconds = 7 days
+
+/* Custom links to be shown for each AS. You can use %as% as a
+   placeholder for the ASN. */
+$customlinks = array(
+	'PeeringDB' => 'http://www.peeringdb.com/view.php?asn=%as%',
+	'robtex' => 'http://www.robtex.com/as/as%as%.html'
+);
+
 ?>

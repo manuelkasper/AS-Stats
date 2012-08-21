@@ -118,3 +118,7 @@ div#legend {
 	margin-top: 1em;
 	padding-top: 0.5em;
 }
+
+.customlinks a {
+	font-size: 0.85em;
+}
