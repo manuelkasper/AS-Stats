@@ -164,7 +164,15 @@ function getASSET($asset) {
         $cmd = $whois ." -h whois.radb.net '!i".$asset."'";
 
         $return_aslist = explode("\n",shell_exec($cmd));
-        $aslist = explode(" ",$return_aslist[1]);
+		
+		/* find the line that contains the AS-SET members */
+		$aslist = array();
+		foreach ($return_aslist as $asline) {
+			if (preg_match("/^AS/", $asline)) {
+				$aslist = explode(" ", $asline);
+				break;
+			}
+		}
     
         $f = fopen($assetfile,"w");
         foreach ($aslist as $as) {

@@ -7,6 +7,9 @@ Changes
 -------
 vx.xx	Add links to PeeringDB and robtex
 		(suggested by Steve Glendinning)
+		
+		Fix AS-SET lookup on systems where the whois command returns
+		additional lines.
 
 
 v1.36	Fix creation of new RRDs when multiple entries with the same
