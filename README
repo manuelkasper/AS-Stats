@@ -125,7 +125,7 @@ v1		Initial release
 How it works
 ------------
 
-A Perl script (netflow-asstatd.pl) collects NetFlow v8 AS aggregation records
+A Perl script (netflow-asstatd.pl) collects NetFlow v8/v9 AS aggregation records
 or sFlow v5 samples from one or more routers. It caches them for about a
 minute (to prevent excessive writes to RRD files), identifies the link that
 each record refers to (by means of the SNMP in/out interface index), maps it
@@ -151,7 +151,7 @@ Prerequisites
 - Perl 5.8
 - RRDtool 1.2 (with Perl "RRDs" library)
 - web server with PHP 5
-- one or more routers than can generate NetFlow v8 AS aggregation records
+- one or more routers than can generate NetFlow v8/v9 AS aggregation records
   or sFlow samples
 
 
@@ -286,6 +286,7 @@ By default, the created RRDs keep data as follows:
 
 	* 48 hours at 5 minute resolution
 	* 1 week at 1 hour resolution
+	* 1 month at 4 hour resolution
 	* 1 year at 1 day resolution
 
 If you want to change that, modify the getrrdfile() function in
