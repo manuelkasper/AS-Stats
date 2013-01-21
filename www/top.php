@@ -56,6 +56,10 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 		<div class="small">~ <?php echo format_bytes($nbytes[0]); ?> in / 
 			<?php echo format_bytes($nbytes[1]); ?> out in the last 24 hours</div>
+		<?php if ($showv6): ?>
+		<div class="vsmall">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
+			<?php echo format_bytes($nbytes[3]); ?> out</div>
+		<?php endif; ?>
 
 <?php if (!empty($customlinks)): ?>
 		<div class="customlinks">
@@ -75,7 +79,12 @@ echo join(" | ", $htmllinks);
 		</div>
 	</th>
 	<td>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&width=500&height=150&nolegend=1" width="581" height="204" border="0" /></a>
+		<?php if ($showv6): ?>
+		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1" width="581" height="215" border="0" /></a>
+		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1" width="581" height="215" border="0" /></a>
+		<?php else: ?>
+		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1" width="581" height="204" border="0" /></a>
+		<?php endif; ?>
 	</td>
 </tr>
 <?php $i++; endforeach; ?>
@@ -100,14 +109,7 @@ foreach ($knownlinks as $link) {
 </table>
 </div>
 
-<div id="footer">
-AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
-<?php if ($outispositive): ?>
-Outbound traffic: positive / Inbound traffic: negative
-<?php else: ?>
-Inbound traffic: positive / Outbound traffic: negative
-<?php endif; ?>
-</div>
+<?php include('footer.inc'); ?>
 
 </body>
 </html>

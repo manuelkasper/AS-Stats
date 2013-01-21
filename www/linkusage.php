@@ -37,21 +37,19 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 	</th>
 	<td>
+		<?php if ($showv6): ?>
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=4" width="581" height="505" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=6" width="581" height="505" border="0" />
+		<?php else: ?>
 		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300" width="581" height="494" border="0" />
+		<?php endif; ?>
 	</td>
 </tr>
 <?php $i++; endforeach; ?>
 
 </table>
 
-<div id="footer">
-AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
-<?php if ($outispositive): ?>
-Outbound traffic: positive / Inbound traffic: negative
-<?php else: ?>
-Inbound traffic: positive / Outbound traffic: negative
-<?php endif; ?>
-</div>
+<?php include('footer.inc'); ?>
 
 </body>
 </html>

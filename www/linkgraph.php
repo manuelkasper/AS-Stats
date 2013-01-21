@@ -14,6 +14,9 @@ $link = $_GET['link'];
 if (!preg_match("/^[0-9a-zA-Z][0-9a-zA-Z\-]+$/", $link))
 	die("Invalid link");
 
+if (@$_GET['v'] == 6)
+	$link .= "_v6";
+
 /* first step: walk the data for all ASes to determine the top 5 for the given link */
 $fd = fopen($daystatsfile, "r");
 $cols = explode("\t", trim(fgets($fd)));
@@ -67,6 +70,9 @@ $knownlinks = getknownlinks();
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
+
+if (@$_GET['v'])
+	$cmd .= "--title IPv" . $_GET['v'] . " ";
 
 /* geneate RRD DEFs */
 foreach ($topas as $as => $traffic) {

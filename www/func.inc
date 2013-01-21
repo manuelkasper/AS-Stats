@@ -115,15 +115,22 @@ function getasstats_top($ntop) {
 		$as = $els[0];
 		$tot_in = 0;
 		$tot_out = 0;
+		$tot_v6_in = 0;
+		$tot_v6_out = 0;
 		
 		for ($i = 1; $i < count($els); $i++) {
-			if (strpos($cols[$i], "_in") !== false)
+			if (strpos($cols[$i], "_in") !== false) {
 				$tot_in += $els[$i];
-			else
+				if (strpos($cols[$i], "_v6_") !== false)
+					$tot_v6_in += $els[$i];
+			} else {
 				$tot_out += $els[$i];
+				if (strpos($cols[$i], "_v6_") !== false)
+					$tot_v6_out += $els[$i];
+			}
 		}
 		
-		$asstats[$as] = array($tot_in, $tot_out);
+		$asstats[$as] = array($tot_in, $tot_out, $tot_v6_in, $tot_v6_out);
 		
 		if (count($asstats) >= $ntop)
 			break;

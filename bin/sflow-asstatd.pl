@@ -102,6 +102,8 @@ while (1) {
 	}
 	
 	foreach my $sFlowSample (@{$sFlowSamplesRef}) {
+		my $ipversion = 4;
+		
 		# only process standard structures
 		next if ($sFlowSample->{'sampleTypeEnterprise'} != 0);
 		
@@ -121,6 +123,9 @@ while (1) {
 		my $noctets;
 		if ($sFlowSample->{'IPv4Packetlength'}) {
 			$noctets = $sFlowSample->{'IPv4Packetlength'};
+		} elsif ($sFlowSample->{'IPv6Packetlength'}) {
+			$noctets = $sFlowSample->{'IPv6Packetlength'};
+			$ipversion = 6;
 		} else {
 			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
 		}
@@ -152,12 +157,12 @@ while (1) {
 			$dstas = 0;
 		}
 		
-		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout);
+		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
 	}
 }
 
 sub handleflow {
-	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout) = @_;
+	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
 		# don't care about internal traffic
@@ -180,8 +185,8 @@ sub handleflow {
 		$direction = "in";
 		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
-		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout);
-		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout);
+		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion);
+		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion);
 		return;
 	}
 	
@@ -190,7 +195,12 @@ sub handleflow {
 		return;
 	}
 	
-	my $dsname = "${ifalias}_${direction}";
+	my $dsname;
+	if ($ipversion == 6) {
+	 	$dsname = "${ifalias}_v6_${direction}";
+	} else {
+	 	$dsname = "${ifalias}_${direction}";
+	}
 	
 	# put it into the cache
 	if (!$ascache->{$as}) {
@@ -285,9 +295,12 @@ sub getrrdfile {
 		while (my ($key, $alias) = each(%knownlinks)) {
 			push(@args, "DS:${alias}_in:ABSOLUTE:300:U:U");
 			push(@args, "DS:${alias}_out:ABSOLUTE:300:U:U");
+			push(@args, "DS:${alias}_v6_in:ABSOLUTE:300:U:U");
+			push(@args, "DS:${alias}_v6_out:ABSOLUTE:300:U:U");
 		}
 		push(@args, "RRA:AVERAGE:0.99999:1:576");	# 48 hours at 5 minute resolution
 		push(@args, "RRA:AVERAGE:0.99999:12:168");	# 1 week at 1 hour resolution
+		push(@args, "RRA:AVERAGE:0.99999:48:180");	# 1 month at 4 hour resolution
 		push(@args, "RRA:AVERAGE:0.99999:288:366");	# 1 year at 1 day resolution
 		RRDs::create($rrdfile, "--start", $startts, @args);
 		

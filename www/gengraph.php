@@ -19,6 +19,9 @@ if (isset($_GET['width']))
 	$width = (int)$_GET['width'];
 if (isset($_GET['height']))
 	$height = (int)$_GET['height'];
+$v6_el = "";
+if (@$_GET['v'] == 6)
+	$v6_el = "v6_";
 
 $knownlinks = getknownlinks();
 $rrdfile = getRRDFileForAS($as);
@@ -26,6 +29,9 @@ $rrdfile = getRRDFileForAS($as);
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
+
+if (@$_GET['v'])
+	$cmd .= "--title IPv" . $_GET['v'] . " ";
 
 if (isset($_GET['nolegend']))
 	$cmd .= "--no-legend ";
@@ -38,18 +44,18 @@ if (isset($_GET['end']) && is_numeric($_GET['end']))
 
 /* geneate RRD DEFs */
 foreach ($knownlinks as $link) {
-	$cmd .= "DEF:{$link['tag']}_in=\"$rrdfile\":{$link['tag']}_in:AVERAGE ";
-	$cmd .= "DEF:{$link['tag']}_out=\"$rrdfile\":{$link['tag']}_out:AVERAGE ";
+	$cmd .= "DEF:{$link['tag']}_{$v6_el}in=\"$rrdfile\":{$link['tag']}_{$v6_el}in:AVERAGE ";
+	$cmd .= "DEF:{$link['tag']}_{$v6_el}out=\"$rrdfile\":{$link['tag']}_{$v6_el}out:AVERAGE ";
 }
 
 /* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
 foreach ($knownlinks as $link) {
 	if ($outispositive) {
-		$cmd .= "CDEF:{$link['tag']}_in_bits={$link['tag']}_in,-8,* ";
-		$cmd .= "CDEF:{$link['tag']}_out_bits={$link['tag']}_out,8,* ";
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in,-8,* ";
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out,8,* ";
 	} else {
-		$cmd .= "CDEF:{$link['tag']}_in_bits={$link['tag']}_in,8,* ";
-		$cmd .= "CDEF:{$link['tag']}_out_bits={$link['tag']}_out,-8,* ";
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in,8,* ";
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out,-8,* ";
 	}
 }
 
@@ -60,7 +66,7 @@ foreach ($knownlinks as $link) {
 		$col = $link['color'] . "BB";
 	else
 		$col = $link['color'];
-	$cmd .= "AREA:{$link['tag']}_in_bits#{$col}:\"{$link['descr']}\"";
+	$cmd .= "AREA:{$link['tag']}_{$v6_el}in_bits#{$col}:\"{$link['descr']}\"";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";
@@ -74,7 +80,7 @@ foreach ($knownlinks as $link) {
 		$col = $link['color'];
 	else
 		$col = $link['color'] . "BB";
-	$cmd .= "AREA:{$link['tag']}_out_bits#{$col}:";
+	$cmd .= "AREA:{$link['tag']}_{$v6_el}out_bits#{$col}:";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";

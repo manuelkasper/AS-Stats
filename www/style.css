@@ -30,6 +30,10 @@
 	font-size: 0.9em;
 }
 
+.vsmall {
+	font-size: 0.85em;
+}
+
 .rank {
 	font-size: 2em;
 	font-weight: bold;
@@ -71,11 +75,15 @@ table.astable th {
 	width: 25em;
 }
 
-.detailgraph {
+.detailgraph, .detailgraph2 {
 	border: 1px solid #aaa;
 	margin-bottom: 1.5em;
 	margin-top: 0.8em;
 	background-color: #eeeeee;
+}
+
+.detailgraph2 {
+	margin-left: 2em;
 }
 
 div#legend {

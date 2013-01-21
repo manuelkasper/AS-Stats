@@ -69,7 +69,7 @@ open(STATSFILE, ">$statsfile.tmp");
 # print header line
 print STATSFILE "as";
 foreach my $link (@links) {
-	print STATSFILE "\t${link}_in\t${link}_out";
+	print STATSFILE "\t${link}_in\t${link}_out\t${link}_v6_in\t${link}_v6_out";
 }
 print STATSFILE "\n";
 
@@ -78,8 +78,10 @@ foreach my $as (@asorder) {
 	print STATSFILE "$as";
 	
 	foreach my $link (@links) {
-		print STATSFILE "\t" . $astraffic->{$as}->{"${link}_in"};
-		print STATSFILE "\t" . $astraffic->{$as}->{"${link}_out"};
+		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_in"});
+		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_out"});
+		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_v6_in"});
+		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_v6_out"});
 	}
 	
 	print STATSFILE "\n";
@@ -88,6 +90,15 @@ foreach my $as (@asorder) {
 close(STATSFILE);
 
 rename("$statsfile.tmp", $statsfile);
+
+sub undefaszero {
+	my $val = shift;
+	if (!defined($val)) {
+		return 0;
+	} else {
+		return $val;
+	}
+}
 
 sub gettraffic {
 
@@ -103,11 +114,16 @@ sub gettraffic {
 	my $rrdfile = "$dirname/$as.rrd";
 	
 	# get list of available DS
+	my $have_v6 = 0;
+	
 	my $availableds = {};
 	my $rrdinfo = RRDs::info($rrdfile);
 	foreach my $ri (keys %$rrdinfo) {
 		if ($ri =~ /^ds\[(.+)\]\.type$/) {
 			$availableds->{$1} = 1;
+			if ($1 =~ /_v6_/) {
+				$have_v6 = 1;
+			}
 		}
 	}
 	
@@ -118,8 +134,21 @@ sub gettraffic {
 		push(@cmd, "DEF:${link}_out=$rrdfile:${link}_out:AVERAGE");
 		push(@cmd, "VDEF:${link}_in_v=${link}_in,TOTAL");
 		push(@cmd, "VDEF:${link}_out_v=${link}_out,TOTAL");
+		
+		if ($have_v6) {
+			push(@cmd, "DEF:${link}_v6_in=$rrdfile:${link}_v6_in:AVERAGE");
+			push(@cmd, "DEF:${link}_v6_out=$rrdfile:${link}_v6_out:AVERAGE");
+			push(@cmd, "VDEF:${link}_v6_in_v=${link}_v6_in,TOTAL");
+			push(@cmd, "VDEF:${link}_v6_out_v=${link}_v6_out,TOTAL");
+		}
+		
 		push(@cmd, "PRINT:${link}_in_v:%lf");
 		push(@cmd, "PRINT:${link}_out_v:%lf");
+		
+		if ($have_v6) {
+			push(@cmd, "PRINT:${link}_v6_in_v:%lf");
+			push(@cmd, "PRINT:${link}_v6_out_v:%lf");
+		}
 	}
 	
 	my @res = RRDs::graph(@cmd);
@@ -131,20 +160,24 @@ sub gettraffic {
 	my $lines = $res[0];
 	
 	for (my $i = 0; $i < scalar(@links); $i++) {
-		my $in = $lines->[$i*2];
-		chomp($in);
-		if (isnan($in)) {
-			$in = 0;
+		my @vals;
+		my $numds = ($have_v6 ? 4 : 2);
+		
+		for (my $j = 0; $j < $numds; $j++) {
+			$vals[$j] = $lines->[$i*$numds+$j];
+			chomp($vals[$j]);
+			if (isnan($vals[$j])) {
+				$vals[$j] = 0;
+			}
 		}
 		
-		my $out = $lines->[$i*2+1];
-		chomp($out);
-		if (isnan($out)) {
-			$out = 0;
-		}
+		$retdata->{$links[$i] . '_in'} = $vals[0];
+		$retdata->{$links[$i] . '_out'} = $vals[1];
 		
-		$retdata->{$links[$i] . '_in'} = $in;
-		$retdata->{$links[$i] . '_out'} = $out;
+		if ($have_v6) {
+			$retdata->{$links[$i] . '_v6_in'} = $vals[2];
+			$retdata->{$links[$i] . '_v6_out'} = $vals[3];
+		}
 	}
 	
 	return $retdata;

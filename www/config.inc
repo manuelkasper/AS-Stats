@@ -11,6 +11,7 @@ $knownlinksfile = "/data/knownlinks";
 $outispositive = true;
 
 $ntop = 20;
+$showv6 = true;
 
 $whois = "/usr/bin/whois";
 $assetpath = "asset";

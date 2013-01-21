@@ -153,14 +153,7 @@ AS-SET: <input type="text" name="asset" size="20" />
 
 <?php endif; ?>
 
-<div id="footer">
-AS-Stats v1.36 written by Manuel Kasper, Monzoon Networks AG.<br/>
-<?php if ($outispositive): ?>
-Outbound traffic: positive / Inbound traffic: negative
-<?php else: ?>
-Inbound traffic: positive / Outbound traffic: negative
-<?php endif; ?>
-</div>
+<?php include('footer.inc'); ?>
 
 </body>
 </html>

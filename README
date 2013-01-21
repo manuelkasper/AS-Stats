@@ -1,11 +1,23 @@
-AS-Stats v1.36 (2012-07-25)
+AS-Stats v1.40 (2012-11-23)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-vx.xx	Add links to PeeringDB and robtex
+v1.40	Add support for NetFlow v9 to netflow-asstatd.pl
+		(sponsored by Xplornet Communications Inc.)
+		
+		Add support for IPv6 (for NetFlow v9 and sFlow). Note: existing
+		RRDs need to be upgraded (new data sources added for v6) for
+		this to work. Enable $showv6 in www/config.inc to see separate
+		graphs for IPv6.
+		
+		Add support for 4-byte ASNs (NetFlow v9 and sFlow). Needs testing.
+		
+		Add RRA for 1 month at 4 hour resolution to newly created RRD files.
+		
+		Add links to PeeringDB and robtex
 		(suggested by Steve Glendinning)
 		
 		Fix AS-SET lookup on systems where the whois command returns
@@ -188,8 +200,9 @@ sFlow data.
   will reach the machine running xx-asstatd.pl (firewall etc.).
 
 - NetFlow only:
-  Have your router(s) send NetFlow v8 AS aggregation records to your machine.
-  This is typically done with commands like the following (Cisco IOS):
+  Have your router(s) send NetFlow v8 or v9 AS aggregation records to
+  your machine. This is typically done with commands like the following
+  (Cisco IOS):
 
 		ip flow-cache timeout active 5
 		
