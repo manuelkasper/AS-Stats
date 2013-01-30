@@ -5,6 +5,9 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+v1.xx	Generate v6 RRD DS in contrib/sync_ds.pl too
+		(spotted by Peter Hansen)
+
 v1.40	Add support for NetFlow v9 to netflow-asstatd.pl
 		(sponsored by Xplornet Communications Inc.)
 		

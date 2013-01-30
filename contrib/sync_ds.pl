@@ -54,6 +54,8 @@ sub read_knownlinks {
 	my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
 	$klfdsnames{$tag."_in"}++;
 	$klfdsnames{$tag."_out"}++;
+	$klfdsnames{$tag."_v6_in"}++;
+	$klfdsnames{$tag."_v6_out"}++;
     }
     close(KLFILE);
     return;
