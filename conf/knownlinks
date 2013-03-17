@@ -1,4 +1,4 @@
-# Router IP		SNMP ifindex	tag				description		color
+# Router IP		SNMP ifindex	tag				description		color	samplingrate (optional)
 # note: tabs must be used to separate fields (not spaces)
 192.0.2.1		15				uplink1			Uplink 1		D41C0E
 192.0.2.1		23				uplink2			Uplink 2		E45605

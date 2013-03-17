@@ -11,6 +11,7 @@ use RRDs;
 use Getopt::Std;
 
 my %knownlinks;
+my %link_samplingrates;
 
 my $samplingrate = 1;	# rate for sampled NetFlow (or = 1 for unsampled)
 
@@ -351,9 +352,17 @@ sub flush_cache {
 		
 			while (my ($dsname, $value) = each(%$cacheent)) {
 				next if ($dsname !~ /_(in|out)$/);
+				
+				my $tag = $dsname;
+				$tag =~ s/(_v6)?_(in|out)$//;
+				my $cursamplingrate = $samplingrate;
+				
+				if ($link_samplingrates{$tag}) {
+					$cursamplingrate = $link_samplingrates{$tag};
+				}
 			
 				push(@templatearg, $dsname);
-				push(@args, $value * $samplingrate);
+				push(@args, $value * $cursamplingrate);
 			}
 		
 		 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
@@ -416,16 +425,22 @@ sub getrrdfile {
 
 sub read_knownlinks {
 	my %knownlinks_tmp;
+	my %link_samplingrates_tmp;
 	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile!");
 	while (<KLFILE>) {
 		chomp;
 		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
 		
-		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
+		my ($routerip,$ifindex,$tag,$descr,$color,$samplingrate) = split(/\t+/);
 		$knownlinks_tmp{"${routerip}_${ifindex}"} = $tag;
+		
+		if ($samplingrate) {
+			$link_samplingrates_tmp{$tag} = $samplingrate;
+		}
 	}
 	close(KLFILE);
 	
 	%knownlinks = %knownlinks_tmp;
+	%link_samplingrates = %link_samplingrates_tmp;
 	return;
 }
