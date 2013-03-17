@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+# PROVIDE: sflow-asstatd
+# REQUIRE: DAEMON
+
+# Add the following line to /etc/rc.conf to enable sflow-asstatd:
+# sflow_asstatd_enable="YES"
+# sflow_asstatd_flags="<set as needed>"
+
+.  /etc/rc.subr
+
+name="sflow_asstatd"
+rcvar=`set_rcvar`
+command="/usr/local/bin/sflow-asstatd.pl"
+command_interpreter="/usr/bin/perl"
+
+load_rc_config $name
+# Set defaults
+: ${sflow_asstatd_enable="NO"}
+: ${sflow_asstatd_pidfile="/var/run/sflow-asstatd.pid"}
+: ${sflow_asstatd_port="6343"}
+: ${sflow_asstatd_user="root"}
+
+start_cmd="/usr/sbin/daemon -f -u ${sflow_asstatd_user} -p ${sflow_asstatd_pidfile} ${command} -p ${sflow_asstatd_port} ${sflow_asstatd_flags}"
+start_postcmd="echo Starting ${name}."
+
+pidfile=${sflow_asstatd_pidfile}
+
+run_rc_command "$1"

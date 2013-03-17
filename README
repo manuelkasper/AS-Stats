@@ -1,12 +1,19 @@
-AS-Stats v1.40 (2013-01-22)
+AS-Stats v1.41 (2013-03-17)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 --------------------------------------------------------------------
 
 Changes
 -------
-v1.xx	Generate v6 RRD DS in contrib/sync_ds.pl too
+v1.41	Generate v6 RRD DS in contrib/sync_ds.pl too
 		(spotted by Peter Hansen)
+		
+		sFlow: fix creation of new RRDs when multiple entries with the same
+		tag are present in the known links file
+		(spotted by Michal Buchtik)
+		
+		Add startup scripts for FreeBSD (contrib/freebsd)
+		(contributed by Michal Buchtik)
 		
 		Add support for setting the sampling rate per link in the
 		knownlinks file.
@@ -156,6 +163,7 @@ Prerequisites
 
 - Perl 5.8
 - RRDtool 1.2 (with Perl "RRDs" library)
+- if using sFlow: the Net::sFlow module (CPAN)
 - web server with PHP 5
 - one or more routers than can generate NetFlow v8/v9 AS aggregation records
   or sFlow samples
@@ -176,7 +184,7 @@ sFlow data.
   	- IP address of router (= source IP of NetFlow datagrams)
   	- SNMP interface index of interface (use "show snmp mib ifmib ifindex"
   	  to find out)
-  	- a short "tag" (15 chars max., alphanumerics only) that will be used
+  	- a short "tag" (12 chars max., alphanumerics only) that will be used
   	  internally (e.g. for RRD DS names)
   	- a human-readable description (will appear in the generated graphs)
   	- a color code for the graphs (HTML style, 6 hex digits)
@@ -242,6 +250,50 @@ sFlow data.
 		mls aging long 128
 		mls aging normal 64
 		mls flow ip interface-full
+		
+  For IOS XR, the configuration looks as follows:
+
+		flow exporter-map FEM
+		 version v9
+		 !
+		 transport udp 9000
+		 source <source interface>
+		 destination <IP address of server running AS stats> vrf default
+
+		flow monitor-map IPV4-FMM
+		 record ipv4
+		 exporter FEM
+		 cache entries 16384
+		 cache timeout active 5
+		!
+		flow monitor-map IPV6-FMM
+		 record ipv6
+		 exporter FEM
+		 cache entries 16384
+		 cache timeout active 5
+		!
+
+		sampler-map SM
+		 random 1 out-of 10000
+
+		router bgp 100
+		  address-family ipv4 unicast
+		   bgp attribute-download
+		  address-family ipv6 unicast
+		   bgp attribute-download
+
+  For JunOS, the configuration looks as follows:
+
+	  family inet {
+	      output {
+	          flow-server x.x.x.x {
+	              port 9000;
+	              autonomous-system-type origin;
+	              aggregation {
+	                  autonomous-system;
+	              }
+	              version 8;
+	          }
 
 - sFlow only:
   Have your router(s) send sFlow samples to your machine. Your routers
