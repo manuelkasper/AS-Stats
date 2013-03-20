@@ -284,16 +284,27 @@ sFlow data.
 
   For JunOS, the configuration looks as follows:
 
-	  family inet {
-	      output {
-	          flow-server x.x.x.x {
-	              port 9000;
-	              autonomous-system-type origin;
-	              aggregation {
-	                  autonomous-system;
-	              }
-	              version 8;
-	          }
+		forwarding-options {
+			sampling {
+				input {
+					rate 2048;
+					max-packets-per-second 4096;
+				}
+				family inet {
+					output {
+						flow-active-timeout 60;
+						flow-server x.x.x.x {
+							port 9000;
+							autonomous-system-type origin;
+							aggregation {
+								autonomous-system;
+							}
+							version 8;
+						}
+					}
+				}
+			}
+		}
 
 - sFlow only:
   Have your router(s) send sFlow samples to your machine. Your routers
