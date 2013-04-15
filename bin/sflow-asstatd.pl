@@ -129,6 +129,13 @@ while (1) {
 			$ipversion = 6;
 		} else {
 			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
+			
+			# make one more attempt at figuring out the IP version
+			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
+				$sFlowSample->{'GatewayIpVersionNextHopRouter'} == 2) ||
+				(defined($sFlowSample->{'HeaderType'}) && $sFlowSample->{'HeaderType'} eq '86dd')) {
+				$ipversion = 6;
+			}
 		}
 		
 		my $srcas = 0;
@@ -170,7 +177,7 @@ sub handleflow {
 		return;
 	}
 	
-	#print "$srcas => $dstas ($noctets octets)\n";
+	#print "$srcas => $dstas ($noctets octets, in $snmpin, out $snmpout, version $ipversion)\n";
 	
 	# determine direction and interface alias name (if known)
 	my $direction;
