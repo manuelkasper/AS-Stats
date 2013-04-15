@@ -5,6 +5,8 @@ by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
 
 Changes
 -------
+vx.xx	Try harder to determine IP version for sFlow samples.
+
 v1.41	Generate v6 RRD DS in contrib/sync_ds.pl too
 		(spotted by Peter Hansen)
 		
