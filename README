@@ -7,6 +7,14 @@ Changes
 -------
 vx.xx	Try harder to determine IP version for sFlow samples.
 
+		Add IPFIX support
+		(contributed by Daniel Piekacz)
+
+		Add experimental NetFlow v5 support
+		(contributed by Charlie Allom)
+		
+		Fix handling of 64-bit counters for NetFlow v9
+
 v1.41	Generate v6 RRD DS in contrib/sync_ds.pl too
 		(spotted by Peter Hansen)
 		
