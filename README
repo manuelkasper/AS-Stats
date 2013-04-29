@@ -1,6 +1,6 @@
 AS-Stats v1.41 (2013-03-17)
 a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
-by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
+by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
 --------------------------------------------------------------------
 
 Changes

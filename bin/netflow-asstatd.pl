@@ -2,7 +2,7 @@
 #
 # $Id$
 #
-# written by Manuel Kasper, Monzoon Networks AG <mkasper@monzoon.net>
+# written by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
 # cli params/rrd storage/sampling mods Steve Colam <steve@colam.co.uk>
 
 use strict;
