@@ -22,6 +22,8 @@ my $ascache_flush_number = 0;
 
 my $server_port = 9000;
 my $MAXREAD = 8192;
+my $v5_header_len = 24;
+my $v5_flowrec_len = 48;
 my $v8_header_len = 28;
 my $v8_flowrec_len = 28;
 my $v9_header_len = 20;
@@ -90,7 +92,9 @@ while (1) {
 
 	my ($version) = unpack("n", $datagram);
 	
-	if ($version == 8) {
+	if ($version == 5) {
+		parse_netflow_v5($datagram, $ipaddr);
+	} elsif ($version == 8) {
 		parse_netflow_v8($datagram, $ipaddr);
 	} elsif ($version == 9) {
 		parse_netflow_v9($datagram, $ipaddr);
@@ -98,6 +102,24 @@ while (1) {
 		print "unknown NetFlow version: $version\n";
 	}
 }
+sub parse_netflow_v5 {
+	my $datagram = shift;
+	my $ipaddr = shift;
+	
+	my ($version, $count, $sysuptime, $unix_secs, $unix_nsecs,
+	  $flow_sequence, $engine_type, $engine_id, $aggregation,
+	  $agg_version) = unpack("nnNNNNCCCC", $datagram);
+
+	my $flowrecs = substr($datagram, $v5_header_len);
+	
+	for (my $i = 0; $i < $count; $i++) {
+		my $flowrec = substr($datagram, $v5_header_len + ($i*$v5_flowrec_len), $v5_flowrec_len);
+		my @flowdata = unpack("NNNnnNNNNnnccccnnccN", $flowrec);
+		print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[6] srcas: $flowdata[15] dstas: $flowdata[16] in: $flowdata[3] out: $flowdata[4] 4 \n";
+		handleflow($ipaddr, $flowdata[6], $flowdata[15], $flowdata[16], $flowdata[3], $flowdata[4], 4);
+	}
+}
+
 
 sub parse_netflow_v8 {
 	my $datagram = shift;
