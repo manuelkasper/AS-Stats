@@ -9,7 +9,6 @@ use strict;
 use IO::Socket;
 use RRDs;
 use Getopt::Std;
-use Math::BigInt;
 
 my %knownlinks;
 my %link_samplingrates;
@@ -202,9 +201,7 @@ sub parse_netflow_v9_data_flowset {
 	my $datalen = length($flowsetdata);
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
-		my ($srcas, $dstas, $snmpin, $snmpout, $ipversion);
-		my $inoctets = Math::BigInt->new();
-		my $outoctets = Math::BigInt->new();
+		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
 
 		$inoctets = 0;
 		$outoctets = 0;
@@ -246,18 +243,16 @@ sub parse_netflow_v9_data_flowset {
 					$inoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
 					$inoctets = unpack("Q", $cur_fldval);
-					#my ($tmp_inoctets1,$tmp_inoctets2) = unpack("NN",$cur_fldval) ;
-					#$inoctets += $tmp_inoctets1<<32;
-					#$inoctets += $tmp_inoctets2;
+					# in case we need to swap byte-order
+					#$inoctets = unpack("Q>*", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
 				if ($cur_fldlen == 4) {
 					$outoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
 					$outoctets = unpack("Q", $cur_fldval);
-					#my ($tmp_outoctets1,$tmp_outoctets2) = unpack("NN",$cur_fldval) ;
-					#$outoctets += $tmp_outoctets1<<32;
-					#$outoctets += $tmp_outoctets2;
+					# in case we need to swap byte-order
+					#$outoctets = unpack("Q>*", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
@@ -351,9 +346,7 @@ sub parse_netflow_v10_data_flowset {
 	my $datalen = length($flowsetdata);
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
-		my ($srcas, $dstas, $snmpin, $snmpout, $ipversion);
-		my $inoctets = Math::BigInt->new();
-		my $outoctets = Math::BigInt->new();
+		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
 
 		$inoctets = 0;
 		$outoctets = 0;
@@ -394,17 +387,13 @@ sub parse_netflow_v10_data_flowset {
 				if ($cur_fldlen == 4) {
 					$inoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					my ($tmp_inoctets1,$tmp_inoctets2) = unpack("NN",$cur_fldval) ;
-					$inoctets += $tmp_inoctets1<<32;
-					$inoctets += $tmp_inoctets2;
+					$inoctets = unpack("Q>*", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
 				if ($cur_fldlen == 4) {
 					$outoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					my ($tmp_outoctets1,$tmp_outoctets2) = unpack("NN",$cur_fldval) ;
-					$outoctets += $tmp_outoctets1<<32;
-					$outoctets += $tmp_outoctets2;
+					$outoctets = unpack("Q>*", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
