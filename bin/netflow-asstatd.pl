@@ -264,17 +264,13 @@ sub parse_netflow_v9_data_flowset {
 				if ($cur_fldlen == 4) {
 					$inoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					$inoctets = unpack("Q", $cur_fldval);
-					# in case we need to swap byte-order
-					#$inoctets = unpack("Q>*", $cur_fldval);
+					$inoctets = unpack("Q>", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
 				if ($cur_fldlen == 4) {
 					$outoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					$outoctets = unpack("Q", $cur_fldval);
-					# in case we need to swap byte-order
-					#$outoctets = unpack("Q>*", $cur_fldval);
+					$outoctets = unpack("Q>", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
@@ -409,13 +405,13 @@ sub parse_netflow_v10_data_flowset {
 				if ($cur_fldlen == 4) {
 					$inoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					$inoctets = unpack("Q>*", $cur_fldval);
+					$inoctets = unpack("Q>", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
 				if ($cur_fldlen == 4) {
 					$outoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
-					$outoctets = unpack("Q>*", $cur_fldval);
+					$outoctets = unpack("Q>", $cur_fldval);
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
