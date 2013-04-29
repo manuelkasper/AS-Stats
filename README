@@ -308,6 +308,74 @@ sFlow data.
 			}
 		}
 
+  JunOS IPFIX configuration:
+		chassis {
+			tfeb {
+				slot 0 {
+					sampling-instance flow-ipfix;
+				}
+			}
+		}
+		interfaces {
+			ge-1/0/0 {
+				unit 0 {
+					family inet {
+						sampling {
+							input;
+							output;
+						}
+					}
+				}
+			}
+		}
+		forwarding-options {
+			sampling {
+				instance {
+					flow-ipfix {
+						input {
+							rate 1;
+						}
+						family inet {
+							output {
+								flow-server 192.0.2.10 {
+									port 9000;
+									autonomous-system-type origin;
+									no-local-dump;
+									version-ipfix {
+										template {
+											ipv4;
+										}
+									}
+								}
+								inline-jflow {
+									source-address 192.0.2.1;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		services {
+			flow-monitoring {
+				version-ipfix {
+					template ipv4 {
+						flow-active-timeout 60;
+						flow-inactive-timeout 60;
+						template-refresh-rate {
+							packets 1000;
+							seconds 10;
+						}
+						option-refresh-rate {
+							packets 1000;
+							seconds 10;
+						}
+						ipv4-template;
+					}
+				}
+			}
+		}
+
 - sFlow only:
   Have your router(s) send sFlow samples to your machine. Your routers
   may need a software upgrade to make them include AS path information for
