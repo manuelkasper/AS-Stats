@@ -308,7 +308,7 @@ sFlow data.
 			}
 		}
 
-  JunOS NetFlow IPFIX configuration:
+  JunOS IPFIX configuration:
 		chassis {
 			tfeb {
 				slot 0 {
