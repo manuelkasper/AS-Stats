@@ -9,6 +9,7 @@ use strict;
 use IO::Socket;
 use RRDs;
 use Getopt::Std;
+use Math::BigInt;
 
 my %knownlinks;
 my %link_samplingrates;
@@ -22,11 +23,13 @@ my $ascache_flush_number = 0;
 
 my $server_port = 9000;
 my $MAXREAD = 8192;
+my $childrunning = 0;
 my $v8_header_len = 28;
 my $v8_flowrec_len = 28;
 my $v9_header_len = 20;
-my $childrunning = 0;
 my $v9_templates = {};
+my $v10_header_len = 16;
+my $v10_templates = {};
 
 use vars qw/ %opt /;
 getopts('r:p:k:s:', \%opt);
@@ -94,6 +97,8 @@ while (1) {
 		parse_netflow_v8($datagram, $ipaddr);
 	} elsif ($version == 9) {
 		parse_netflow_v9($datagram, $ipaddr);
+	} elsif ($version == 10) {
+		parse_netflow_v10($datagram, $ipaddr);
 	} else {
 		print "unknown NetFlow version: $version\n";
 	}
@@ -197,8 +202,10 @@ sub parse_netflow_v9_data_flowset {
 	my $datalen = length($flowsetdata);
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
-		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
-	
+		my ($srcas, $dstas, $snmpin, $snmpout, $ipversion);
+		my $inoctets = Math::BigInt->new();
+		my $outoctets = Math::BigInt->new();
+
 		$inoctets = 0;
 		$outoctets = 0;
 		$ipversion = 4;
@@ -239,12 +246,165 @@ sub parse_netflow_v9_data_flowset {
 					$inoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
 					$inoctets = unpack("Q", $cur_fldval);
+					#my ($tmp_inoctets1,$tmp_inoctets2) = unpack("NN",$cur_fldval) ;
+					#$inoctets += $tmp_inoctets1<<32;
+					#$inoctets += $tmp_inoctets2;
 				}
 			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
 				if ($cur_fldlen == 4) {
 					$outoctets = unpack("N", $cur_fldval);
 				} elsif ($cur_fldlen == 8) {
 					$outoctets = unpack("Q", $cur_fldval);
+					#my ($tmp_outoctets1,$tmp_outoctets2) = unpack("NN",$cur_fldval) ;
+					#$outoctets += $tmp_outoctets1<<32;
+					#$outoctets += $tmp_outoctets2;
+				}
+			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
+				$ipversion = unpack("C", $cur_fldval);
+			} elsif ($cur_fldtype == 27 || $cur_fldtype == 28) {	# IPV6_SRC_ADDR/IPV6_DST_ADDR
+				$ipversion = 6;
+			}
+		}
+	
+		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
+			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
+		}
+	}
+}
+
+sub parse_netflow_v10 {
+	my $datagram = shift;
+	my $ipaddr = shift;
+	
+	# Parse packet
+	my ($version, $length, $sysuptime, $seqno, $source_id, @flowsets) = unpack("nnNNN(nnX4/a)*", $datagram);
+	
+	# Loop through FlowSets and take appropriate action
+	for (my $i = 0; $i < scalar @flowsets; $i += 2) {
+		my $flowsetid = $flowsets[$i];
+		my $flowsetdata = substr($flowsets[$i+1], 4);	# chop off id/length
+
+		if ($flowsetid == 2) {
+			# 0 = Template FlowSet
+			parse_netflow_v10_template_flowset($flowsetdata, $ipaddr, $source_id);
+		} elsif ($flowsetid == 3) {
+			# 1 - Options Template FlowSet
+		} elsif ($flowsetid > 255) {
+			# > 255: Data FlowSet
+			parse_netflow_v10_data_flowset($flowsetid, $flowsetdata, $ipaddr, $source_id);
+		} else {
+			# reserved FlowSet
+			print "Unknown FlowSet ID $flowsetid found\n";
+		}
+	}
+}
+
+sub parse_netflow_v10_template_flowset {
+	my $templatedata = shift;
+	my $ipaddr = shift;
+	my $source_id = shift;
+	
+	# Note: there may be multiple templates in a Template FlowSet
+	
+	my @template_ints = unpack("n*", $templatedata);
+
+	my $i = 0;
+	while ($i < scalar @template_ints) {
+	
+		my $template_id = $template_ints[$i];
+		my $fldcount = $template_ints[$i+1];
+
+		last if (!defined($template_id) || !defined($fldcount));
+
+		#print "Updated template ID $template_id (source ID $source_id, from " . inet_ntoa($ipaddr) . ")\n";
+		my $template = [@template_ints[($i+2) .. ($i+2+$fldcount*2-1)]];
+
+		$v10_templates->{$ipaddr}->{$source_id}->{$template_id}->{'template'} = $template;
+
+		# Calculate total length of template data
+		my $totallen = 0;
+		for (my $j = 1; $j < scalar @$template; $j += 2) {
+			$totallen += $template->[$j];
+		}
+
+		$v10_templates->{$ipaddr}->{$source_id}->{$template_id}->{'len'} = $totallen;
+
+		$i += (2 + $fldcount*2);
+	}
+}
+
+sub parse_netflow_v10_data_flowset {
+	my $flowsetid = shift;
+	my $flowsetdata = shift;
+	my $ipaddr = shift;
+	my $source_id = shift;
+
+	my $template = $v10_templates->{$ipaddr}->{$source_id}->{$flowsetid}->{'template'};
+	if (!defined($template)) {
+		#print "Template ID $flowsetid from $source_id/" . inet_ntoa($ipaddr) . " does not (yet) exist\n";
+		return;
+	}
+	
+	my $len = $v10_templates->{$ipaddr}->{$source_id}->{$flowsetid}->{'len'};
+	
+	my $ofs = 0;
+	my $datalen = length($flowsetdata);
+	while (($ofs + $len) <= $datalen) {
+		# Interpret values according to template
+		my ($srcas, $dstas, $snmpin, $snmpout, $ipversion);
+		my $inoctets = Math::BigInt->new();
+		my $outoctets = Math::BigInt->new();
+
+		$inoctets = 0;
+		$outoctets = 0;
+		$ipversion = 4;
+		
+		for (my $i = 0; $i < scalar @$template; $i += 2) {
+			my $cur_fldtype = $template->[$i];
+			my $cur_fldlen = $template->[$i+1];
+
+			my $cur_fldval = substr($flowsetdata, $ofs, $cur_fldlen);
+			$ofs += $cur_fldlen;
+
+			if ($cur_fldtype == 16) {	# SRC_AS
+				if ($cur_fldlen == 2) {
+					$srcas = unpack("n", $cur_fldval);
+				} elsif ($cur_fldlen == 4) {
+					$srcas = unpack("N", $cur_fldval);
+				}
+			} elsif ($cur_fldtype == 17) {	# DST_AS
+				if ($cur_fldlen == 2) {
+					$dstas = unpack("n", $cur_fldval);
+				} elsif ($cur_fldlen == 4) {
+					$dstas = unpack("N", $cur_fldval);
+				}
+			} elsif ($cur_fldtype == 10) {	# INPUT_SNMP
+				if ($cur_fldlen == 2) {
+					$snmpin = unpack("n", $cur_fldval);
+				} elsif ($cur_fldlen == 4) {
+					$snmpin = unpack("N", $cur_fldval);
+				}
+			} elsif ($cur_fldtype == 14) {	# OUTPUT_SNMP
+				if ($cur_fldlen == 2) {
+					$snmpout = unpack("n", $cur_fldval);
+				} elsif ($cur_fldlen == 4) {
+					$snmpout = unpack("N", $cur_fldval);
+				}
+			} elsif ($cur_fldtype == 1) {	# IN_BYTES
+				if ($cur_fldlen == 4) {
+					$inoctets = unpack("N", $cur_fldval);
+				} elsif ($cur_fldlen == 8) {
+					my ($tmp_inoctets1,$tmp_inoctets2) = unpack("NN",$cur_fldval) ;
+					$inoctets += $tmp_inoctets1<<32;
+					$inoctets += $tmp_inoctets2;
+				}
+			} elsif ($cur_fldtype == 23) {	# OUT_BYTES
+				if ($cur_fldlen == 4) {
+					$outoctets = unpack("N", $cur_fldval);
+				} elsif ($cur_fldlen == 8) {
+					my ($tmp_outoctets1,$tmp_outoctets2) = unpack("NN",$cur_fldval) ;
+					$outoctets += $tmp_outoctets1<<32;
+					$outoctets += $tmp_outoctets2;
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
