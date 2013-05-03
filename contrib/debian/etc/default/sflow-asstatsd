@@ -1,0 +1,4 @@
+RRD_DIR=/tmp
+CONF_FILE=/etc/as-stats/sflow-links
+ASN=65534
+EXTRA_ARGS=""
