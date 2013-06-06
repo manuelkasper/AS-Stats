@@ -1,7 +1,7 @@
 <?php
 /*
  * $Id$
- * 
+ *
  * written by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
  */
 
@@ -66,6 +66,7 @@ foreach ($knownlinks as $link) {
 		$col = $link['color'] . "BB";
 	else
 		$col = $link['color'];
+	$descr = str_replace(':', '\:', $link['descr']); # Escaping colons in description
 	$cmd .= "AREA:{$link['tag']}_{$v6_el}in_bits#{$col}:\"{$link['descr']}\"";
 	if ($i > 0)
 		$cmd .= ":STACK";
