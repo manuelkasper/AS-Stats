@@ -67,7 +67,7 @@ foreach ($knownlinks as $link) {
 	else
 		$col = $link['color'];
 	$descr = str_replace(':', '\:', $link['descr']); # Escaping colons in description
-	$cmd .= "AREA:{$link['tag']}_{$v6_el}in_bits#{$col}:\"{$link['descr']}\"";
+	$cmd .= "AREA:{$link['tag']}_{$v6_el}in_bits#{$col}:\"{$descr}\"";
 	if ($i > 0)
 		$cmd .= ":STACK";
 	$cmd .= " ";
