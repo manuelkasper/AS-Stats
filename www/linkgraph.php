@@ -11,7 +11,7 @@ $numtop = 10;
 $ascolors = array("D41C0E", "E45605", "FECF12", "2FA11C", "19BB7C", "0A4484", "0A7484", "4CB4C4", "971928", "1f348c");
 
 $link = $_GET['link'];
-if (!preg_match("/^[0-9a-zA-Z][0-9a-zA-Z\-]+$/", $link))
+if (!preg_match("/^[0-9a-zA-Z][0-9a-zA-Z\-_]+$/", $link))
 	die("Invalid link");
 
 if (@$_GET['v'] == 6)
