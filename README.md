@@ -1,9 +1,8 @@
 AS-Stats v1.41 (2013-03-17)
 ===========================
 
-a simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
+A simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
-
 
 How it works
 ------------
@@ -71,7 +70,7 @@ sFlow data.
   startup script for your operating system to automatically start
   xx-asstatd.pl on boot):
   
-  	nohup xx-asstatd.pl -r /path/to/rrd/dir -k /path/to/knownlinks &
+  	`nohup xx-asstatd.pl -r /path/to/rrd/dir -k /path/to/knownlinks &`
 
   By default, netflow-asstatd.pl will listen on port 9000 (UDP) for NetFlow
   datagrams, and sflow-asstatd.pl will listen on port 6343 (UDP) for sFlow
@@ -259,8 +258,8 @@ sFlow data.
 
 - Add a cronjob to run the following command every hour:
 
-	rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks \
-		/path/to/asstats_day.txt
+	`rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks \
+		/path/to/asstats_day.txt`
 
   That script will go through all RRD files and collect per-link summary
   stats for each AS, sort them by total traffic (descending), and write them
