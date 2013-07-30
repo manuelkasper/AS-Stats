@@ -8,7 +8,7 @@
 require_once('func.inc');
 
 $numtop = 10;
-$ascolors = array("D41C0E", "E45605", "FECF12", "2FA11C", "19BB7C", "0A4484", "0A7484", "4CB4C4", "971928", "1f348c");
+$ascolors = array("A6CEE3", "1F78B4", "B2DF8A", "33A02C", "FB9A99", "E31A1C", "FDBF6F", "FF7F00", "CAB2D6", "6A3D9A");
 
 $link = $_GET['link'];
 if (!preg_match("/^[0-9a-zA-Z][0-9a-zA-Z\-_]+$/", $link))
