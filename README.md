@@ -152,7 +152,7 @@ sFlow data.
 		   bgp attribute-download
 
   For JunOS, the configuration looks as follows:
-```
+
 		forwarding-options {
 			sampling {
 				input {
@@ -174,10 +174,10 @@ sFlow data.
 				}
 			}
 		}
-```
+
   JunOS IPFIX configuration:
-```		
-    chassis {
+
+		chassis {
 			tfeb {
 				slot 0 {
 					sampling-instance flow-ipfix;
@@ -243,7 +243,7 @@ sFlow data.
 				}
 			}
 		}
-```
+
 
 - sFlow only:
   Have your router(s) send sFlow samples to your machine. Your routers
