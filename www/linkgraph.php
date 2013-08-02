@@ -72,7 +72,7 @@ $cmd = "$rrdtool graph - " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
 if (@$_GET['v'])
-	$cmd .= "--title IPv" . $_GET['v'] . " ";
+	$cmd .= "--title IPv" . $_GET['v'] . "\ -\ " . $_GET['link'] . " ";
 
 /* geneate RRD DEFs */
 foreach ($topas as $as => $traffic) {
