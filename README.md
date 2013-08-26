@@ -1,4 +1,4 @@
-AS-Stats v1.41 (2013-03-17)
+AS-Stats v1.42 (2013-08-26)
 ===========================
 
 A simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
