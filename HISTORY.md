@@ -1,4 +1,4 @@
-## x.xx
+## 1.42
 	
 * Try harder to determine IP version for sFlow samples.
 *	Add IPFIX support (contributed by Daniel Piekacz)
