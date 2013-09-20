@@ -2,7 +2,7 @@
 
 use strict;
 
-my $ds = 2;
+my $ds = 4;
 
 # change the name(s) of the new data sources here
 my $newlinkname = 'newlink';
