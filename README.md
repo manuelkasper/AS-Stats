@@ -58,7 +58,8 @@ sFlow data.
   	- a human-readable description (will appear in the generated graphs)
   	- a color code for the graphs (HTML style, 6 hex digits)
   
-  See the example file provided (knownlinks) for the format.
+  See the example file provided (knownlinks) for the format.  
+  __Important: you must use tabs, not spaces, to separate fields!__
 
 - Create a directory to hold per-AS RRD files. For each AS, about 128 KB of
   storage are required, and there could be (in theory) up to 64511 ASes.
