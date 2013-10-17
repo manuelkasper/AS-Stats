@@ -25,4 +25,5 @@ $customlinks = array(
 	'HE' => 'http://bgp.he.net/AS%as%'
 );
 
-?>
+
+/* END - no closing php tag needed here (prevents problems with stray whitespace) */
