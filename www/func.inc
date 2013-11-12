@@ -218,5 +218,3 @@ function clearCacheFileASSET($asset) {
 		unlink($file);
 	}
 }
-
-?>

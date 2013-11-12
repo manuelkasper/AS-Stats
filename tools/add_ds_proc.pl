@@ -2,10 +2,11 @@
 
 use strict;
 
-my $ds = 2;
+my $ds = 4;
 
 # change the name(s) of the new data sources here
-my @dsnames = ('newlink_in', 'newlink_out');
+my $newlinkname = 'newlink';
+my @dsnames = ($newlinkname.'_in', $newlinkname.'_out', $newlinkname.'_v6_in', $newlinkname.'_v6_out');
 
 my $default_val = 'NaN';
 my $type = 'ABSOLUTE';

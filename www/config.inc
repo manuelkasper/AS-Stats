@@ -21,8 +21,9 @@ $asset_cache_life ="604800"; # 604800 seconds = 7 days
    placeholder for the ASN. */
 $customlinks = array(
 	'PeeringDB' => 'http://www.peeringdb.com/view.php?asn=%as%',
-	'robtex' => 'http://www.robtex.com/as/as%as%.html'
+	'robtex' => 'http://www.robtex.com/as/as%as%.html',
 	'HE' => 'http://bgp.he.net/AS%as%'
 );
 
-?>
+
+/* END - no closing php tag needed here (prevents problems with stray whitespace) */
