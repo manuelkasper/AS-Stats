@@ -31,17 +31,12 @@ $knownlinks = getknownlinks();
 $class = (($i % 2) == 0) ? "even" : "odd";
 ?>
 <tr class="<?php echo $class; ?>">
-	<th style="width: 15em">
-		<div class="title">
-			<?php echo $link['descr']; ?>
-		</div>
-	</th>
 	<td>
 		<?php if ($showv6): ?>
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=4" width="581" height="499" border="0" />
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=6" width="581" height="499" border="0" />
+		<img alt="<?php echo $link['descr']; ?> - IPv4" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=4" width="581" height="499" border="0" />
+		<img alt="<?php echo $link['descr']; ?> - IPv6" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=6" width="581" height="499" border="0" />
 		<?php else: ?>
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300" width="581" height="481" border="0" />
+		<img alt="<?php echo $link['descr']; ?> - IPv4" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=576&amp;height=300&amp;v=4" width="657" height="499" border="0" />
 		<?php endif; ?>
 	</td>
 </tr>
