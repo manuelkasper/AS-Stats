@@ -173,11 +173,11 @@ sub handleflow {
 	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
-		# don't care about internal traffic
+		# don't care about internal traffic
 		return;
 	}
 	
-	#print "$srcas => $dstas ($noctets octets, in $snmpin, out $snmpout, version $ipversion)\n";
+	#print "$srcas => $dstas ($noctets octets, version $ipversion, snmpin $snmpin, snmpout $snmpout)\n";
 	
 	# determine direction and interface alias name (if known)
 	my $direction;
@@ -194,7 +194,7 @@ sub handleflow {
 		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
 		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion);
-		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion);
+		handleflow($routerip, $noctets, 0, $dstas, $snmpin, $snmpout, $ipversion);
 		return;
 	}
 	
@@ -234,13 +234,14 @@ sub flush_cache {
 		return;
 	}
 
+	$childrunning = 1;
 	my $pid = fork();
 
 	if (!defined $pid) {
+		$childrunning = 0;
 		print "cannot fork\n";
 	} elsif ($pid != 0) {
 		# in parent
-		$childrunning = 1;
 		$ascache_lastflush = time;
 		for (keys %$ascache) {
 			if ($_ % 10 == $ascache_flush_number % 10) {
@@ -253,7 +254,7 @@ sub flush_cache {
 
 	while (my ($as, $cacheent) = each(%$ascache)) {
 		if ($as % 10 == $ascache_flush_number % 10) {
-			print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
+			#print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
 		
 			my $rrdfile = getrrdfile($as, $cacheent->{updatets});
 			my @templatearg;
@@ -292,7 +293,7 @@ sub getrrdfile {
 	my $as = shift;
 	my $startts = shift;
 	$startts--;
-
+	
 	# we create 256 directories and store RRD files based on the lower
 	# 8 bytes of the AS number
 	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
