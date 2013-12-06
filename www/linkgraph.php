@@ -71,7 +71,7 @@ $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
-if (@$_GET['v'])
+if (isset($_GET['v']) && is_numeric($_GET['v']))
 	$cmd .= "--title IPv" . $_GET['v'] . " ";
 
 /* geneate RRD DEFs */
