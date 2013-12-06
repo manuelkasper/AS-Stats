@@ -1,3 +1,10 @@
+## 1.43
+	
+* Add v6 data sources to add_ds_proc.pl
+* Remove closing tag from config.inc to prevent whitespace problems in gengraph.php
+* Fix security issue in gengraph.php/linkgraph.php
+* Updated asinfo.txt with data from whois.cymru.com.
+
 ## 1.42
 	
 * Try harder to determine IP version for sFlow samples.
