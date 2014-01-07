@@ -1,3 +1,11 @@
+## 1.5
+
+* Merged netflow-asstatd.pl and sflow-asstatd.pl into one script so
+  that it can handle NetFlow and sFlow sources concurrently
+  (contributed by Wouter de Jong). Please note the following changes:
+	* The sampling rate command line parameter (-s) has been removed. Instead, the sampling rate must now be specified for each link in the knownlinks file to avoid confusion with prior defaults. **If you're using NetFlow without sampling, you need to add the sampling rate 1 to each link.**
+	* The command line parameter to set the sFlow listen port has been changed to -P to avoid a clash with the NetFlow port parameter (-p).
+
 ## 1.43
 	
 * Add v6 data sources to add_ds_proc.pl

@@ -1,13 +1,13 @@
-AS-Stats v1.43 (2013-12-06)
+AS-Stats v1.5b (2014-01-xx)
 ===========================
 
-A simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
+A simple tool to generate per-AS traffic graphs from NetFlow/sFlow records  
 by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
 
 How it works
 ------------
 
-A Perl script (netflow-asstatd.pl) collects NetFlow v8/v9 AS aggregation records
+A Perl script (asstatd.pl) collects NetFlow v8/v9 AS aggregation records
 or sFlow v5 samples from one or more routers. It caches them for about a
 minute (to prevent excessive writes to RRD files), identifies the link that
 each record refers to (by means of the SNMP in/out interface index), maps it
@@ -40,11 +40,7 @@ Prerequisites
 
 Installation
 ------------
-In the instructions below, "xx-asstatd.pl" refers to either netflow-asstatd.pl
-or sflow-asstatd.pl, depending on whether your routers generate NetFlow or
-sFlow data.
-
-- Copy the perl scripts xx-asstatd.pl and rrd-extractstats.pl to the
+- Copy the perl scripts asstatd.pl and rrd-extractstats.pl to the
   machine that will collect NetFlow/sFlow records
 
 - Create a "known links" file with the following information about each
@@ -57,6 +53,7 @@ sFlow data.
   	  internally (e.g. for RRD DS names)
   	- a human-readable description (will appear in the generated graphs)
   	- a color code for the graphs (HTML style, 6 hex digits)
+  	- the sampling rate (or 1 if you're not using sampling on the router)
   
   See the example file provided (knownlinks) for the format.  
   __Important: you must use tabs, not spaces, to separate fields!__
@@ -67,21 +64,19 @@ sFlow data.
   more efficient storage of RRD files (one directory per lower byte of
   AS number, in hex).
 
-- Start xx-asstatd.pl in the background (or, better yet, write a
+- Start asstatd.pl in the background (or, better yet, write a
   startup script for your operating system to automatically start
-  xx-asstatd.pl on boot):
+  asstatd.pl on boot):
   
-  	`nohup xx-asstatd.pl -r /path/to/rrd/dir -k /path/to/knownlinks &`
+  	`nohup asstatd.pl -r /path/to/rrd/dir -k /path/to/knownlinks &`
 
-  By default, netflow-asstatd.pl will listen on port 9000 (UDP) for NetFlow
-  datagrams, and sflow-asstatd.pl will listen on port 6343 (UDP) for sFlow
-  datagrams. Use the -p option if you want to change that.
-  If you use sampled NetFlow or sFlow, set the sampling rate with the -s
-  option.
-  sflow-asstatd.pl also needs you to specify your own AS number with the -a
+  By default, asstatd.pl will listen on port 9000 (UDP) for NetFlow
+  datagrams, and on port 6343 (UDP) for sFlow datagrams. Use the -p/-P options
+  if you want to change that (use 0 as the port number to disable either protocol).
+  For sFlow, you also need to specify your own AS number with the -a
   option for accurate classification of inbound and outbound traffic.
   It's a good idea to make sure only UDP datagrams from your trusted routers
-  will reach the machine running xx-asstatd.pl (firewall etc.).
+  will reach the machine running asstatd.pl (firewall etc.).
 
 - NetFlow only:
   Have your router(s) send NetFlow v8 or v9 AS aggregation records to
@@ -254,7 +249,7 @@ sFlow data.
 
 - Wait 1-2 minutes. You should then see new RRD files popping up in the
   directory that you defined/created earlier on. If not, make sure that
-  xx-asstatd.pl is running, not spewing out any error messages, and that
+  asstatd.pl is running, not spewing out any error messages, and that
   the NetFlow/sFlow datagrams are actually reaching your machine (tcpdump...).
 
 - Add a cronjob to run the following command every hour:
@@ -285,7 +280,7 @@ Adding a new link involves adding two new data sources to all RRD files.
 This is a bit of a PITA since RRDtool itself doesn't provide a command to do
 that. A simple (but slow) Perl script that is meant to be used with RRDtool's
 XML dump/restore feature is provided (add_ds_proc.pl, add_ds.sh). Note that
-netflow-asstatd.pl should be stopped while modifying RRD files, to avoid
+asstatd.pl should be stopped while modifying RRD files, to avoid
 breaking them with concurrent modifications.
 
 
@@ -299,7 +294,7 @@ By default, the created RRDs keep data as follows:
 	* 1 year at 1 day resolution
 
 If you want to change that, modify the getrrdfile() function in
-xx-asstatd.pl and delete any old RRD files.
+asstatd.pl and delete any old RRD files.
 
 
 To do

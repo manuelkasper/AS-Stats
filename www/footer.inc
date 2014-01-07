@@ -1,5 +1,5 @@
 <div id="footer">
-AS-Stats v1.43 written by Manuel Kasper for Monzoon Networks AG.<br/>
+AS-Stats v1.5b written by Manuel Kasper for Monzoon Networks AG.<br/>
 <?php if ($outispositive): ?>
 Outbound traffic: positive / Inbound traffic: negative
 <?php else: ?>

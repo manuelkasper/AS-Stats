@@ -6,6 +6,7 @@
 # cli params/rrd storage/sampling mods Steve Colam <steve@colam.co.uk>
 
 use strict;
+use IO::Select;
 use IO::Socket;
 use RRDs;
 use Getopt::Std;
@@ -13,18 +14,18 @@ use Getopt::Std;
 my %knownlinks;
 my %link_samplingrates;
 
-my $samplingrate = 1;	# rate for sampled NetFlow (or = 1 for unsampled)
-
 my $ascache = {};
 my $ascache_lastflush = 0;
 my $ascache_flush_interval = 25;
 my $ascache_flush_number = 0;
 
-my $server_port = 9000;
 my $MAXREAD = 8192;
+my $childrunning = 0;
+
+# NetFlow
+my $server_port = 9000;
 my $v5_header_len = 24;
 my $v5_flowrec_len = 48;
-my $childrunning = 0;
 my $v8_header_len = 28;
 my $v8_flowrec_len = 28;
 my $v9_header_len = 20;
@@ -32,32 +33,44 @@ my $v9_templates = {};
 my $v10_header_len = 16;
 my $v10_templates = {};
 
-use vars qw/ %opt /;
-getopts('r:p:k:s:', \%opt);
+# sFlow
+my $sflow_server_port = 6343;
 
-my $usage = "$0 [-rpks]\n".
+use vars qw/ %opt /;
+getopts('r:p:P:k:a:', \%opt);
+
+my $usage = "$0 [-rpPka]\n".
 	"\t-r <path to RRD files>\n".
-	"\t(-p <UDP listen port - default $server_port>)\n".
+	"\t(-p <NetFlow UDP listen port - default $server_port, use 0 to disable NetFlow)\n".
+	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
 	"\t-k <path to known links file>\n".
-	"\t(-s <sampling rate - default $samplingrate>)\n";
+	"\t-a <your own AS number> - only required for sFlow\n";
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
+my $myas = $opt{'a'};
 
 die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile));
 
 die("$rrdpath does not exist or is not a directory\n") if ! -d $rrdpath;
 die("$knownlinksfile does not exist or is not a file\n") if ! -f $knownlinksfile;
 
-if (defined($opt{'s'})) {
-	$samplingrate = $opt{'s'};
-	die("Sampling rate is non numeric\n") if $samplingrate !~ /^[0-9]+$/;
-}
-
 if (defined($opt{'p'})) {
 	$server_port = $opt{'p'};
-	die("Server port is non numeric\n") if $server_port !~ /^[0-9]+$/;
+	die("NetFlow server port is non numeric\n") if $server_port !~ /^[0-9]+$/;
 }
+
+if (defined($opt{'P'})) {
+	$sflow_server_port = $opt{'P'};
+	die("sFlow server port is non numeric\n") if $sflow_server_port !~ /^[0-9]+$/;
+}
+
+if ($sflow_server_port == $server_port) {
+	die("sFlow server port can't be the same as NetFlow server port\n");
+}
+
+die("Your own AS number is non numeric\n") if ($sflow_server_port > 0 && $myas !~ /^[0-9]+$/);
+
 
 # reap dead children
 $SIG{CHLD} = \&REAPER;
@@ -79,33 +92,56 @@ sub TERM {
 # read known links file
 read_knownlinks();
 
+my ($lsn_nflow, $lsn_sflow);
+my $sel = IO::Select->new();
+
 # prepare to listen for NetFlow UDP packets
-my $server = IO::Socket::INET->new(LocalPort => $server_port, Proto => "udp")
-	  or die "Couldn't be a udp server on port $server_port : $@\n";
+if ($server_port > 0) {
+	$lsn_nflow = IO::Socket::INET->new(LocalPort => $server_port, Proto => "udp")
+		or die "Couldn't be a NetFlow UDP server on port $server_port : $@\n";
+	$sel->add($lsn_nflow);
+}
+# prepare to listen for sFlow UDP packets
+if ($sflow_server_port > 0) {
+	require Net::sFlow;
+	$lsn_sflow = IO::Socket::INET->new(LocalPort => $sflow_server_port, Proto => "udp")
+		or die "Couldn't be a sFlow UDP server on port $sflow_server_port : $@\n";
+	$sel->add($lsn_sflow);
+}
 
 my ($him,$datagram,$flags);
 
-# main NetFlow datagram receive loop
+# main datagram receive loop
 while (1) {
-	$him = $server->recv($datagram, $MAXREAD);
-	next if (!$him);
-	
-	my ($port, $ipaddr) = sockaddr_in($server->peername);
-
-	my ($version) = unpack("n", $datagram);
-	
-	if ($version == 5) {
-		parse_netflow_v5($datagram, $ipaddr);
-	} elsif ($version == 8) {
-		parse_netflow_v8($datagram, $ipaddr);
-	} elsif ($version == 9) {
-		parse_netflow_v9($datagram, $ipaddr);
-	} elsif ($version == 10) {
-		parse_netflow_v10($datagram, $ipaddr);
-	} else {
-		print "unknown NetFlow version: $version\n";
+	while (my @ready = $sel->can_read) {
+		foreach my $server (@ready) {
+			$him = $server->recv($datagram, $MAXREAD);
+			next if (!$him);
+			
+			my ($port, $ipaddr) = sockaddr_in($server->peername);
+			
+			if (defined($lsn_nflow) && $server == $lsn_nflow) {
+				my ($version) = unpack("n", $datagram);
+				
+				if ($version == 5) {
+					parse_netflow_v5($datagram, $ipaddr);
+				} elsif ($version == 8) {
+					parse_netflow_v8($datagram, $ipaddr);
+				} elsif ($version == 9) {
+					parse_netflow_v9($datagram, $ipaddr);
+				} elsif ($version == 10) {
+					parse_netflow_v10($datagram, $ipaddr);
+				} else {
+					print "unknown NetFlow version: $version\n";
+				}
+			}
+			elsif (defined($lsn_sflow) && $server == $lsn_sflow) {
+				parse_sflow($datagram, $ipaddr);
+			}
+		}
 	}
 }
+
 sub parse_netflow_v5 {
 	my $datagram = shift;
 	my $ipaddr = shift;
@@ -119,11 +155,10 @@ sub parse_netflow_v5 {
 	for (my $i = 0; $i < $count; $i++) {
 		my $flowrec = substr($datagram, $v5_header_len + ($i*$v5_flowrec_len), $v5_flowrec_len);
 		my @flowdata = unpack("NNNnnNNNNnnccccnnccN", $flowrec);
-		print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[6] srcas: $flowdata[15] dstas: $flowdata[16] in: $flowdata[3] out: $flowdata[4] 4 \n";
-		handleflow($ipaddr, $flowdata[6], $flowdata[15], $flowdata[16], $flowdata[3], $flowdata[4], 4);
+		#print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[6] srcas: $flowdata[15] dstas: $flowdata[16] in: $flowdata[3] out: $flowdata[4] 4 \n";
+		handleflow($ipaddr, $flowdata[6], $flowdata[15], $flowdata[16], $flowdata[3], $flowdata[4], 4, 'netflow');
 	}
 }
-
 
 sub parse_netflow_v8 {
 	my $datagram = shift;
@@ -143,7 +178,8 @@ sub parse_netflow_v8 {
 	for (my $i = 0; $i < $count; $i++) {
 		my $flowrec = substr($datagram, $v8_header_len + ($i*$v8_flowrec_len), $v8_flowrec_len);
 		my @flowdata = unpack("NNNNNnnnn", $flowrec);
-		handleflow($ipaddr, $flowdata[2], $flowdata[5], $flowdata[6], $flowdata[7], $flowdata[8], 4);
+		#print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[2] srcas: $flowdata[5] dstas: $flowdata[6] in: $flowdata[7] out: $flowdata[8] 4 \n";
+		handleflow($ipaddr, $flowdata[2], $flowdata[5], $flowdata[6], $flowdata[7], $flowdata[8], 4, 'netflow');
 	}
 }
 
@@ -280,7 +316,7 @@ sub parse_netflow_v9_data_flowset {
 		}
 	
 		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
-			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
+			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow');
 		}
 	}
 }
@@ -421,8 +457,92 @@ sub parse_netflow_v10_data_flowset {
 		}
 	
 		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
-			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
+			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow');
 		}
+	}
+}
+
+sub parse_sflow {
+	my $datagram = shift;
+	my $ipaddr = shift;
+	
+	# decode the sFlow packet
+	my ($sFlowDatagramRef, $sFlowSamplesRef, $errorsRef) = Net::sFlow::decode($datagram);
+	
+	if ($sFlowDatagramRef->{'sFlowVersion'} != 5) {
+		print "Warning: non-v5 packet received - not supported\n";
+		return;
+	}
+	
+	# use agent IP if available (in case of proxy)
+	if ($sFlowDatagramRef->{'AgentIp'}) {
+		$ipaddr = inet_aton($sFlowDatagramRef->{'AgentIp'});
+	}
+	
+	foreach my $sFlowSample (@{$sFlowSamplesRef}) {
+		my $ipversion = 4;
+		
+		# only process standard structures
+		next if ($sFlowSample->{'sampleTypeEnterprise'} != 0);
+		
+		# only process normal flow samples
+		next if ($sFlowSample->{'sampleTypeFormat'} != 1);
+		
+		my $snmpin = $sFlowSample->{'inputInterface'};
+		my $snmpout = $sFlowSample->{'outputInterface'};
+		
+		if ($snmpin >= 1073741823 || $snmpout >= 1073741823) {
+			# invalid interface index - could be dropped packet or internal
+			# (routing protocol, management etc.)
+			#print "Invalid interface index $snmpin/$snmpout\n";
+			next;
+		}
+		
+		my $noctets;
+		if ($sFlowSample->{'IPv4Packetlength'}) {
+			$noctets = $sFlowSample->{'IPv4Packetlength'};
+		} elsif ($sFlowSample->{'IPv6Packetlength'}) {
+			$noctets = $sFlowSample->{'IPv6Packetlength'};
+			$ipversion = 6;
+		} else {
+			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
+			
+			#Â make one more attempt at figuring out the IP version
+			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
+				$sFlowSample->{'GatewayIpVersionNextHopRouter'} == 2) ||
+				(defined($sFlowSample->{'HeaderType'}) && $sFlowSample->{'HeaderType'} eq '86dd')) {
+				$ipversion = 6;
+			}
+		}
+		
+		my $srcas = 0;
+		my $dstas = 0;
+		
+		if ($sFlowSample->{'GatewayAsSource'}) {
+			$srcas = $sFlowSample->{'GatewayAsSource'};
+		}
+		if ($sFlowSample->{'GatewayDestAsPaths'}) {
+			$dstas = pop(@{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}});
+			if (!$dstas) {
+				$dstas = 0;
+			}
+		}
+		
+		# Outbound packets have our AS number as the source (GatewayAsSource),
+		# while inbound packets have 0 as the destination (empty AsPath).
+		# Transit packets have "foreign" AS numbers for both source and 
+		# destination (handleflow() currently deals with those by counting
+		# them twice; once for input and once for output)
+		
+		# substitute 0 for own AS number
+		if ($srcas == $myas) {
+			$srcas = 0;
+		}
+		if ($dstas == $myas) {
+			$dstas = 0;
+		}
+		
+		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow');
 	}
 }
 
@@ -430,10 +550,10 @@ sub handleflow {
 	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
-		# don't care about internal traffic
+		# don't care about internal traffic
 		return;
 	}
-	
+
 	#print "$srcas => $dstas ($noctets octets, version $ipversion, snmpin $snmpin, snmpout $snmpout)\n";
 	
 	# determine direction and interface alias name (if known)
@@ -451,7 +571,7 @@ sub handleflow {
 		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
 		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion);
-		handleflow($routerip, $noctets, 0, $dstas, $snmpin, $snmpout, $ipversion);
+		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion);
 		return;
 	}
 	
@@ -485,7 +605,6 @@ sub handleflow {
 }
 
 sub flush_cache {
-
 	if ($childrunning || ((time - $ascache_lastflush) < $ascache_flush_interval)) {
 		# can't/don't want to flush cache right now
 		return;
@@ -522,12 +641,8 @@ sub flush_cache {
 				
 				my $tag = $dsname;
 				$tag =~ s/(_v6)?_(in|out)$//;
-				my $cursamplingrate = $samplingrate;
+				my $cursamplingrate = $link_samplingrates{$tag};
 				
-				if ($link_samplingrates{$tag}) {
-					$cursamplingrate = $link_samplingrates{$tag};
-				}
-			
 				push(@templatearg, $dsname);
 				push(@args, $value * $cursamplingrate);
 			}
@@ -550,7 +665,7 @@ sub getrrdfile {
 	my $as = shift;
 	my $startts = shift;
 	$startts--;
-	
+
 	# we create 256 directories and store RRD files based on the lower
 	# 8 bytes of the AS number
 	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
@@ -593,17 +708,19 @@ sub getrrdfile {
 sub read_knownlinks {
 	my %knownlinks_tmp;
 	my %link_samplingrates_tmp;
-	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile!");
+	open(KLFILE, $knownlinksfile) or die("Cannot open $knownlinksfile: $!");
 	while (<KLFILE>) {
 		chomp;
 		next if (/(^\s*#)|(^\s*$)/);	# empty line or comment
 		
-		my ($routerip,$ifindex,$tag,$descr,$color,$samplingrate) = split(/\t+/);
+		my ($routerip,$ifindex,$tag,$descr,$color,$linksamplingrate) = split(/\t+/);
 		$knownlinks_tmp{"${routerip}_${ifindex}"} = $tag;
 		
-		if ($samplingrate) {
-			$link_samplingrates_tmp{$tag} = $samplingrate;
+		unless(defined($linksamplingrate) && $linksamplingrate =~ /^\d+$/) {
+			die("ERROR: No samplingrate for ".$routerip."\n");
 		}
+		
+		$link_samplingrates_tmp{$tag} = $linksamplingrate;
 	}
 	close(KLFILE);
 	
@@ -611,3 +728,4 @@ sub read_knownlinks {
 	%link_samplingrates = %link_samplingrates_tmp;
 	return;
 }
+
