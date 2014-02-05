@@ -297,6 +297,11 @@ If you want to change that, modify the getrrdfile() function in
 asstatd.pl and delete any old RRD files.
 
 
+Support
+-------
+A mailing list is available at https://groups.google.com/d/forum/as-stats-users. Please do not send requests for help/support directly to the author.
+
+
 To do
 -----
 
