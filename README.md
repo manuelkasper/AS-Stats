@@ -49,7 +49,7 @@ Installation
   	- IP address of router (= source IP of NetFlow datagrams)
   	- SNMP interface index of interface (use "show snmp mib ifmib ifindex"
   	  to find out)
-  	- a short "tag" (12 chars max., alphanumerics only) that will be used
+  	- a short "tag" (12 chars max., a-z A-Z 0-9 _ only) that will be used
   	  internally (e.g. for RRD DS names)
   	- a human-readable description (will appear in the generated graphs)
   	- a color code for the graphs (HTML style, 6 hex digits)

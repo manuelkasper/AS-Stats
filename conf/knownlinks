@@ -1,6 +1,6 @@
 # Router IP		SNMP ifindex	tag				description		color	samplingrate
 # note: tabs must be used to separate fields (not spaces)
-# max. length for tag is 12 characters
+# max. length for tag is 12 characters; allowed characters: a-z A-Z 0-9 _
 192.0.2.1		15				uplink1			Uplink 1		A6CEE3	1
 192.0.2.1		23				uplink2			Uplink 2		1F78B4	1
 192.0.2.2		4				uplink3			Uplink 3		B2DF8A	1
