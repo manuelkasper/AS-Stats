@@ -9,6 +9,7 @@ $rrdtool = "/usr/local/bin/rrdtool";
 $asinfofile = "asinfo.txt";
 $knownlinksfile = "/data/knownlinks";
 $outispositive = true;
+$show95th = true;
 
 $ntop = 20;
 $showv6 = true;
