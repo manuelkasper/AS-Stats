@@ -9,7 +9,7 @@ error_reporting(0);
 
 require_once('func.inc');
 
-$as = $_GET['as'];
+$as = str_replace('as','',str_replace(' ','',strtolower($_GET['as'])));
 if ($as)
 	$asinfo = getASInfo($as);
 
