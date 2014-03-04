@@ -54,11 +54,11 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 			<?php endif; ?>
 			AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 		</div>
-		<div class="small">~ <?php echo format_bytes($nbytes[0]); ?> in / 
+		<div class="small">IPv4: ~ <?php echo format_bytes($nbytes[0]); ?> in / 
 			<?php echo format_bytes($nbytes[1]); ?> out in the last 24 hours</div>
 		<?php if ($showv6): ?>
-		<div class="vsmall">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
-			<?php echo format_bytes($nbytes[3]); ?> out</div>
+		<div class="small">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
+			<?php echo format_bytes($nbytes[3]); ?> out in the last 24 hours</div>
 		<?php endif; ?>
 
 <?php if (!empty($customlinks)): ?>
