@@ -26,7 +26,7 @@ $rrdfile = getRRDFileForAS($as);
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
-<body>
+<body  onload="document.forms[0].as.focus(); document.forms[0].as.select();">
 
 <div id="nav"><a href="top.php">Top AS</a> | View an AS | <a href="asset.php">View an AS-SET</a> | <a href="linkusage.php">Link usage</a></div>
 
