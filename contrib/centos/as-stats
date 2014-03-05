@@ -10,7 +10,7 @@
 # Source function library.
 . /etc/init.d/functions
 
-DAEMON=netflow-asstatd.pl
+DAEMON=asstatd.pl
 RRDDIR=/data/as-stats/rrd
 KNOWNLINKS=/data/as-stats/conf/knownlinks
 
