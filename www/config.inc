@@ -24,7 +24,8 @@ $customlinks = array(
 	'PeeringDB' => 'http://www.peeringdb.com/view.php?asn=%as%',
 	'robtex' => 'http://www.robtex.com/as/as%as%.html',
 	'HE' => 'http://bgp.he.net/AS%as%',
-	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance'
+	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance',
+	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%'
 );
 
 
