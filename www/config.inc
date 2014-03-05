@@ -2,12 +2,12 @@
 
 /* changes these values to suit your local configuration */
 
-$rrdpath = "/data/rrd";
-$daystatsfile = "/data/asstats_day.txt";
-$rrdtool = "/usr/local/bin/rrdtool";
+$rrdpath = "/as-stats/rrd";
+$daystatsfile = "/as-stats/asstats_day.txt";
+$rrdtool = "/usr/bin/rrdtool";
 
 $asinfofile = "asinfo.txt";
-$knownlinksfile = "/data/knownlinks";
+$knownlinksfile = "/as-stats/conf/knownlinks";
 $outispositive = true;
 $show95th = true;
 
