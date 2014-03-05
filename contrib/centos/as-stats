@@ -12,7 +12,7 @@
 
 DAEMON=netflow-asstatd.pl
 RRDDIR=/data/as-stats/rrd
-KNOWNLINKS=/data/as-stats/etc/netflow-knownlinks
+KNOWNLINKS=/data/as-stats/conf/knownlinks
 
 prog="as-stats"
 
