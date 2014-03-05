@@ -83,4 +83,79 @@ if ( $action == "clearall" ) {
 <table class="astable">
 <?php
 		foreach( $as_num as $as ): 
-			$as
+			$asinfo = getASInfo($as);$class = (($i % 2) == 0) ? "even" : "odd";
+?>
+<tr class="<?php echo $class; ?>">
+	<th>
+		<div class="title">
+			<?php
+			$flagfile = "flags/" . strtolower($asinfo['country']) . ".gif";
+			if (file_exists($flagfile)):
+				$is = getimagesize($flagfile);
+			?>
+			<img src="<?php echo $flagfile; ?>" <?php echo $is[3]; ?>>
+			<?php endif; ?>
+			AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
+		</div>
+
+		<div class="rank">
+			#<?php echo ($i+1); ?>
+		 </div>
+	</th>
+	<td>
+		<?php 
+			$rrdfile = getRRDFileForAS($as);
+			
+			if (file_exists($rrdfile)): ?>
+        		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1" width="581" height="204" border="0" /></a>
+			<?php else: ?>
+				<p><center>No data found for AS<?php echo $as; ?></center></p>
+			<?php endif; ?>
+	</td>
+</tr>
+
+<?php 
+		$i++; 
+		endforeach; 
+?>
+
+</table>
+
+<div id="legend">
+<table>
+<?php
+$knownlinks = getknownlinks();
+foreach ($knownlinks as $link) {
+    echo "<tr><td style=\"border: 4px solid #fff;\">";
+
+    echo "<table style=\"border-collapse: collapse; margin: 0; padding: 0\"><tr>";
+    echo "<td width=\"9\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
+    echo "<td width=\"9\" height=\"18\" style=\"opacity: 0.73; background-color: #{$link['color']}\">&nbsp;</td>";
+    echo "</tr></table>";
+
+    echo "</td><td>&nbsp;" . $link['descr'] . "</td></tr>\n";
+}
+?>
+</table>
+</div>
+
+<?php	
+		else:
+			echo "No data found for AS-SET: ".$asset;
+		endif;
+	else:
+?>
+<div id="nav"><a href="asset.php?action=clearall">Remove all AS-SET cache files.</a></div>
+<form action="" method="get">
+AS-SET: <input type="text" name="asset" size="20" />
+<input type="submit" value="Go" />
+</form>
+
+<?php endif; ?>
+
+<?php include('footer.inc'); ?>
+
+</body>
+</html>
+
+<?php } ?>
