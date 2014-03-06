@@ -28,7 +28,7 @@ $rrdfile = getRRDFileForAS($as);
 
 <body  onload="document.forms[0].as.focus(); document.forms[0].as.select();">
 
-<div id="nav"><a href="top.php">Top AS</a> | View an AS | <a href="asset.php">View an AS-SET</a> | <a href="linkusage.php">Link usage</a></div>
+<div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($as): ?>
 <div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></div>
