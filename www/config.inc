@@ -13,6 +13,7 @@ $show95th = true;
 
 $ntop = 20;
 $showv6 = true;
+$showtitledetail = true;
 
 $whois = "/usr/bin/whois";
 $assetpath = "asset";
