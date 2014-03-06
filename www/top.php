@@ -32,7 +32,8 @@ $topas = getasstats_top($ntop);
 Number of AS: 
 <input type="text" name="n" size="4" value="<?php echo $ntop; ?>" />
 <input type="submit" value="Go" style="margin-right: 2em" />
-Top AS | <a href="history.php">View an AS</a> | <a href="asset.php">View an AS-SET</a> | <a href="linkusage.php">Link usage</a></form>
+<?php include('headermenu.inc'); ?>
+</form>
 </div>
 <div class="pgtitle">Top <?php echo $ntop; ?> AS</div>
 
