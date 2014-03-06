@@ -23,7 +23,7 @@ endif;
 
 
 if ($dpagename == "linkusage"): 
-	?><a href="linkusage.php" class="selected">Link usage</a> | <?php
+	?><a href="linkusage.php" class="selected">Link usage</a><?php
 else:
 	?><a href="linkusage.php">Link usage</a><?php 
 endif;
