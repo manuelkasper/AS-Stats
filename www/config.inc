@@ -2,12 +2,12 @@
 
 /* changes these values to suit your local configuration */
 
-$rrdpath = "/data/rrd";
-$daystatsfile = "/data/asstats_day.txt";
-$rrdtool = "/usr/local/bin/rrdtool";
+$rrdpath = "/data/as-stats/rrd";
+$daystatsfile = "/data/as-stats/asstats_day.txt";
+$rrdtool = "/usr/bin/rrdtool";
 
 $asinfofile = "asinfo.txt";
-$knownlinksfile = "/data/knownlinks";
+$knownlinksfile = "/data/as-stats/conf/knownlinks";
 $outispositive = true;
 $show95th = true;
 
@@ -24,7 +24,8 @@ $customlinks = array(
 	'PeeringDB' => 'http://www.peeringdb.com/view.php?asn=%as%',
 	'robtex' => 'http://www.robtex.com/as/as%as%.html',
 	'HE' => 'http://bgp.he.net/AS%as%',
-	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance'
+	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance',
+	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%'
 );
 
 
