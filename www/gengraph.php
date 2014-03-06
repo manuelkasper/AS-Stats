@@ -35,8 +35,11 @@ if($outispositive)
 else
         $cmd .= "--vertical-label '<- OUT | IN ->' ";
 
-if (isset($_GET['v']) && is_numeric($_GET['v']))
-	$cmd .= "--title IPv" . $_GET['v'] . " ";
+if($showtitledetail && $_GET['dname'] != "")
+	$cmd .= "--title " . str_replace(' ','\ ',rawurldecode($_GET['dname'])) . " ";
+else
+	if (isset($_GET['v']) && is_numeric($_GET['v']))
+		$cmd .= "--title IPv" . $_GET['v'] . " ";
 
 if (isset($_GET['nolegend']))
 	$cmd .= "--no-legend ";
