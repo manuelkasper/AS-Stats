@@ -22,7 +22,7 @@ $knownlinks = getknownlinks();
 
 <body>
 
-<div id="nav"><a href="top.php">Top AS</a> | <a href="history.php">View an AS</a> | <a href="asset.php">View an AS-SET</a> | Link usage</div>
+<div id="nav"><?php include('headermenu.inc'); ?></div>
 <div class="pgtitle">Link usage - top 10 AS per link</div>
 
 <table class="astable">
