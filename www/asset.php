@@ -35,7 +35,7 @@ if ( $action == "clearall" ) {
 </head>
 
 <body  onload="document.forms[0].asset.focus(); document.forms[0].asset.select();">
-<div id="nav"><a href="top.php">Top AS</a> | <a href="history.php">View an AS</a> | View an AS-SET | <a href="linkusage.php">Link usage</a></div>
+<div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($asset): ?>
 <div class="pgtitle">History for AS-SET: <?php echo $asset; ?></div>
