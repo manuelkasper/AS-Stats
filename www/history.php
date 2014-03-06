@@ -38,34 +38,34 @@ $rrdfile = getRRDFileForAS($as);
 <?php else: ?>
 <div class="title">Daily</div>
 <?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>" alt="daily graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>" alt="daily graph" />
+<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="daily graph" />
+<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="daily graph" />
 <?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>" alt="daily graph" />
+<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="daily graph" />
 <?php endif; ?>
 
 <div class="title">Weekly</div>
 <?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>" alt="weekly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>" alt="weekly graph" />
+<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
+<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="weekly graph" />
 <?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>" alt="weekly graph" />
+<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
 <?php endif; ?>
 
 <div class="title">Monthly</div>
 <?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>" alt="monthly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>" alt="monthly graph" />
+<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="monthly graph" />
+<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="monthly graph" />
 <?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>" alt="monthly graph" />
+<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="monthly graph" />
 <?php endif; ?>
 
 <div class="title">Yearly</div>
 <?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>" alt="yearly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>" alt="yearly graph" />
+<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="yearly graph" />
+<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="yearly graph" />
 <?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>" alt="yearly graph" />
+<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="yearly graph" />
 <?php endif; ?>
 <?php endif; ?>
 <?php else: ?>
