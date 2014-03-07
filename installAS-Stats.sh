@@ -1,17 +1,15 @@
-sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/selinux/config
-yum update –y
-yum install -y httpd httpd-devel php php-gd phpimap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mcrypt curl curl-devel perl-libwwwperl libxml2 php-mbstring rrdtool perl-rrdtool jwhois
+yum install -y httpd httpd-devel php php-gd phpimap php-ldap php-odbc php-pear php-xml php-xmlrpc php-mcrypt curl curl-devel perl-libwwwperl libxml2 php-mbstring rrdtool perl-rrdtool
+yum install -y jwhois
 service iptables stop
 service iptables status
 chkconfig iptables off
 
 mkdir /data
-mkdir /data/as-stats
 cd /data
 git clone git://github.com/datatecuk/AS-Stats
-mv /data/AS-Stats/* /data/as-stats
+mv /data/AS-Stats/ /data/as-stats
 mkdir /data/as-stats/rrd
-chmod 0755 /data/as-stats/rrd
+chmod 0777 /data/as-stats/rrd
 mkdir /data/as-stats/www/asset
 chmod 0777 /data/as-stats/www/asset
 cp /data/as-stats/contrib/centos/as-stats /etc/rc.d/init.d/as-stats
@@ -50,4 +48,3 @@ chkconfig httpd on
 service httpd start
 chkconfig as-stats on
 service as-stats start
-reboot
