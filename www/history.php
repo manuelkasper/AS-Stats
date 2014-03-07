@@ -36,6 +36,14 @@ $rrdfile = getRRDFileForAS($as);
 <?php if (!file_exists($rrdfile)): ?>
 <p>No data found for AS <?php echo $as; ?></p>
 <?php else: ?>
+<div class="title">4 Hourly</div>
+<?php if ($showv6): ?>
+<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
+<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="weekly graph" />
+<?php else: ?>
+<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
+<?php endif; ?>
+
 <div class="title">Daily</div>
 <?php if ($showv6): ?>
 <img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="daily graph" />
