@@ -1,24 +1,24 @@
 <?php 
 $dpagename = basename($_SERVER['PHP_SELF'], ".php");
 
-if ($dpagename == "top4"): 
-	?><a href="top4.php" class="selected">Top AS - 4 Hour</a> | <?php
-else:
-	?><a href="top4.php">Top AS - 4 Hour</a> | <?php 
-endif;
-
-
-if ($dpagename == "top12"): 
-	?><a href="top12.php" class="selected">Top AS - 12 Hour</a> | <?php
-else:
-	?><a href="top12.php">Top AS - 12 Hour</a> | <?php 
-endif;
-
-
 if ($dpagename == "top"): 
 	?><a href="top.php" class="selected">Top AS</a> | <?php
 else:
 	?><a href="top.php">Top AS</a> | <?php 
+endif;
+
+
+if ($dpagename == "top4"): 
+	?><a href="top4.php" class="selected">4 Hour</a> | <?php
+else:
+	?><a href="top4.php">4 Hour</a> | <?php 
+endif;
+
+
+if ($dpagename == "top12"): 
+	?><a href="top12.php" class="selected">12 Hour</a> | <?php
+else:
+	?><a href="top12.php">12 Hour</a> | <?php 
 endif;
 
 
