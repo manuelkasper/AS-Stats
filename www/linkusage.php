@@ -31,11 +31,13 @@ $knownlinks = getknownlinks();
 $class = (($i % 2) == 0) ? "even" : "odd";
 ?>
 <tr class="<?php echo $class; ?>">
+	<?php if (($showtitledetail && !$hidelinkusagename) || (!$showtitledetail)): ?>
 	<th style="width: 15em">
 		<div class="title">
 			<?php echo $link['descr']; ?>
 		</div>
 	</th>
+	<?php endif; ?>
 	<td>
 		<?php if ($showv6): ?>
 		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=500&amp;height=300&amp;v=4&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV4"); ?>" width="581" height="499" border="0" />
