@@ -14,6 +14,7 @@ $show95th = true;
 $ntop = 20;
 $showv6 = true;
 $showtitledetail = true;
+$hidelinkusagename  = true;	  # $showtitledetail will need to be true to allow this
 
 $whois = "/usr/bin/whois";
 $assetpath = "asset";
