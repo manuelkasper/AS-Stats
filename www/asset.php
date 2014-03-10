@@ -107,7 +107,12 @@ if ( $action == "clearall" ) {
 			$rrdfile = getRRDFileForAS($as);
 			
 			if (file_exists($rrdfile)): ?>
-        		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1" width="581" height="204" border="0" /></a>
+				<?php if ($showv6): ?>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" width="581" height="204" border="0" /></a>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" width="581" height="204" border="0" /></a>
+				<?php else: ?>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" width="581" height="204" border="0" /></a>
+				<?php endif; ?>
 			<?php else: ?>
 				<p><center>No data found for AS<?php echo $as; ?></center></p>
 			<?php endif; ?>
