@@ -84,7 +84,7 @@ echo join(" | ", $htmllinks);
 		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;start=<?php echo (time() - 12*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" width="581" height="207" border="0" /></a>
 		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;start=<?php echo (time() - 12*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" width="581" height="207" border="0" /></a>
 		<?php else: ?>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1&amp;start=<?php echo (time() - 12*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" width="581" height="189" border="0" /></a>
+		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1&amp;start=<?php echo (time() - 12*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" width="581" height="189" border="0" /></a>
 		<?php endif; ?>
 	</td>
 </tr>
