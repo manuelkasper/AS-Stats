@@ -31,7 +31,20 @@ $rrdfile = getRRDFileForAS($as);
 <div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($as): ?>
-<div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?></div>
+<div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
+	<?php if (!empty($customlinks)): ?>
+	<div class="customlinks">
+	<?php 
+		$htmllinks = array();
+		foreach ($customlinks as $linkname => $url) {
+			$url = str_replace("%as%", $as, $url);
+			$htmllinks[] = "<a href=\"$url\" target=\"_blank\">" . htmlspecialchars($linkname) . "</a>\n";
+		}
+		echo join(" | ", $htmllinks);
+		?>
+	</div>
+	<?php endif; ?>
+</div>
 
 <?php if (!file_exists($rrdfile)): ?>
 <p>No data found for AS <?php echo $as; ?></p>
