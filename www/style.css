@@ -113,7 +113,15 @@ div#legend {
 #nav a, #nav a:visited {
 	text-decoration: none;
 	font-weight: bold;
-	color: #0000ee;
+	font-size: 1.15em;
+	color: #0066CC;
+}
+
+#nav a.selected:link, #nav a.selected:visited {
+	font-size: 1.15em;
+	text-decoration: none;
+	font-weight: bold;
+	color: #000000;
 }
 
 #nav a:hover {
@@ -129,4 +137,9 @@ div#legend {
 
 .customlinks a {
 	font-size: 0.85em;
+}
+
+.customlinks a, .customlinks a:visited {
+	text-decoration: none;
+	color: #0066CC;
 }

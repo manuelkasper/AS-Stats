@@ -35,10 +35,23 @@ if ( $action == "clearall" ) {
 </head>
 
 <body  onload="document.forms[0].asset.focus(); document.forms[0].asset.select();">
-<div id="nav"><a href="top.php">Top AS</a> | <a href="history.php">View an AS</a> | View an AS-SET | <a href="linkusage.php">Link usage</a></div>
+<div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($asset): ?>
-<div class="pgtitle">History for AS-SET: <?php echo $asset; ?></div>
+<div class="pgtitle">History for AS-SET: <?php echo $asset; ?>
+	<?php if (!empty($customlinks)): ?>
+	<div class="customlinks">
+	<?php 
+		$htmllinks = array();
+		foreach ($customlinks as $linkname => $url) {
+			$url = str_replace("%as%", $as, $url);
+			$htmllinks[] = "<a href=\"$url\" target=\"_blank\">" . htmlspecialchars($linkname) . "</a>\n";
+		}
+		echo join(" | ", $htmllinks);
+		?>
+	</div>
+	<?php endif; ?>
+</div>
 <?php else: ?>
 <div class="pgtitle">View history for an AS-SET</div>
 <?php endif; ?>
@@ -107,7 +120,12 @@ if ( $action == "clearall" ) {
 			$rrdfile = getRRDFileForAS($as);
 			
 			if (file_exists($rrdfile)): ?>
-        		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1" width="581" height="204" border="0" /></a>
+				<?php if ($showv6): ?>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" width="581" height="204" border="0" /></a>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" width="581" height="204" border="0" /></a>
+				<?php else: ?>
+					<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" width="581" height="204" border="0" /></a>
+				<?php endif; ?>
 			<?php else: ?>
 				<p><center>No data found for AS<?php echo $as; ?></center></p>
 			<?php endif; ?>

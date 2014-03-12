@@ -20,7 +20,7 @@ start() {
         echo -n $"Starting $prog: "
 
         # start daemon
-        daemon /data/as-stats/bin/$DAEMON $RRDDIR $KNOWNLINKS >> /data/as-stats/output.log &
+        daemon /data/as-stats/bin/$DAEMON -r $RRDDIR -k $KNOWNLINKS -p 9000 -a 0 -P 0 >> /data/as-stats/output.log &
 	RETVAL=$?
 	echo
 	[ $RETVAL = 0 ] && touch /var/lock/subsys/as-stats
@@ -77,4 +77,3 @@ case "$1" in
 esac
 
 exit $RETVAL
-

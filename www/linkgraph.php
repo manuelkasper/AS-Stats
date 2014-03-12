@@ -71,8 +71,11 @@ $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
-if (isset($_GET['v']) && is_numeric($_GET['v']))
-	$cmd .= "--title IPv" . $_GET['v'] . " ";
+if($showtitledetail && $_GET['dname'] != "")
+	$cmd .= "--title " . str_replace(' ','\ ',rawurldecode($_GET['dname'])) . " ";
+else
+	if (isset($_GET['v']) && is_numeric($_GET['v']))
+		$cmd .= "--title IPv" . $_GET['v'] . " ";
 
 /* geneate RRD DEFs */
 foreach ($topas as $as => $traffic) {
