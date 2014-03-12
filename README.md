@@ -129,13 +129,13 @@ Installation
 		 record ipv4
 		 exporter FEM
 		 cache entries 16384
-		 cache timeout active 5
+		 cache timeout active 300
 		!
 		flow monitor-map IPV6-FMM
 		 record ipv6
 		 exporter FEM
 		 cache entries 16384
-		 cache timeout active 5
+		 cache timeout active 300
 		!
 
 		sampler-map SM
