@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# PROVIDE: asstatd
+# REQUIRE: DAEMON LOGIN
+# KEYWORD: shutdown
+#
+# Add the following line to /etc/rc.conf to enable asstatd:
+# asstatd_enable="YES"
+# asstatd_flags="<set as needed>"
+
+.  /etc/rc.subr
+
+name="asstatd"
+rcvar=`set_rcvar`
+command="/usr/local/bin/asstatd.pl"
+command_interpreter="/usr/bin/perl"
+
+load_rc_config $name
+# Set defaults
+: ${asstatd_enable="NO"}
+: ${asstatd_pidfile="/var/run/asstatd.pid"}
+: ${asstatd_netflow_port="9000"}
+: ${asstatd_sflow_port="6343"}
+: ${asstatd_user="root"}
+
+start_cmd="/usr/sbin/daemon -f -u ${asstatd_user} -p ${asstatd_pidfile} ${command} -p ${asstatd_netflow_port} -P ${asstatd_sflow_port} ${asstatd_flags}"
+start_postcmd="echo Starting ${name}."
+
+pidfile=${asstatd_pidfile}
+
+run_rc_command "$1"
