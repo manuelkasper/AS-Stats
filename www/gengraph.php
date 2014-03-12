@@ -31,12 +31,12 @@ $cmd = "$rrdtool graph - " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
 if($outispositive)
-        $cmd .= "--vertical-label '<- IN | OUT ->' ";
+	$cmd .= "--vertical-label '<- IN | OUT ->' ";
 else
-        $cmd .= "--vertical-label '<- OUT | IN ->' ";
+	$cmd .= "--vertical-label '<- OUT | IN ->' ";
 
 if($showtitledetail && $_GET['dname'] != "")
-	$cmd .= "--title " . str_replace(' ','\ ',rawurldecode($_GET['dname'])) . " ";
+	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
 else
 	if (isset($_GET['v']) && is_numeric($_GET['v']))
 		$cmd .= "--title IPv" . $_GET['v'] . " ";
@@ -56,39 +56,52 @@ foreach ($knownlinks as $link) {
 	$cmd .= "DEF:{$link['tag']}_{$v6_el}out=\"$rrdfile\":{$link['tag']}_{$v6_el}out:AVERAGE ";
 }
 
-$tot_in_bits = "CDEF:tot_in_bits=0";
-$tot_out_bits = "CDEF:tot_out_bits=0";
-
-/* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
-foreach ($knownlinks as $link) {
-        $cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits_pos={$link['tag']}_{$v6_el}in,8,* ";
-        $cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits_pos={$link['tag']}_{$v6_el}out,8,* ";
-        $tot_in_bits .= ",{$link['tag']}_{$v6_el}in_bits_pos,ADDNAN";
-        $tot_out_bits .= ",{$link['tag']}_{$v6_el}out_bits_pos,ADDNAN";
-}
-
-$cmd .= "$tot_in_bits ";
-$cmd .= "$tot_out_bits ";
-
-$cmd .= "VDEF:tot_in_bits_95th_pos=tot_in_bits,95,PERCENT ";
-$cmd .= "VDEF:tot_out_bits_95th_pos=tot_out_bits,95,PERCENT ";
-
-if ($outispositive) {
-        $cmd .= "CDEF:tot_in_bits_95th=tot_in_bits,POP,tot_in_bits_95th_pos,-1,* ";
-        $cmd .= "CDEF:tot_out_bits_95th=tot_out_bits,POP,tot_out_bits_95th_pos,1,* ";
+if ($compat_rrdtool12) {
+	/* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
+	foreach ($knownlinks as $link) {
+	   if ($outispositive) {
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in,-8,* ";
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out,8,* ";
+		} else {
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in,8,* ";
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out,-8,* ";
+		}
+	}
 } else {
-        $cmd .= "CDEF:tot_in_bits_95th=tot_in_bits,POP,tot_in_bits_95th_pos,1,* ";
-        $cmd .= "CDEF:tot_out_bits_95th=tot_out_bits,POP,tot_out_bits_95th_pos,-1,* ";
-}
+	$tot_in_bits = "CDEF:tot_in_bits=0";
+	$tot_out_bits = "CDEF:tot_out_bits=0";
 
-foreach ($knownlinks as $link) {
-        if ($outispositive) {
-                $cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in_bits_pos,-1,* ";
-                $cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out_bits_pos,1,* ";
-        } else {
-                $cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out_bits_pos,-1,* ";
-                $cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in_bits_pos,1,* ";
-        }
+	/* generate a CDEF for each DEF to multiply by 8 (bytes to bits), and reverse for outbound */
+	foreach ($knownlinks as $link) {
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits_pos={$link['tag']}_{$v6_el}in,8,* ";
+		$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits_pos={$link['tag']}_{$v6_el}out,8,* ";
+		$tot_in_bits .= ",{$link['tag']}_{$v6_el}in_bits_pos,ADDNAN";
+		$tot_out_bits .= ",{$link['tag']}_{$v6_el}out_bits_pos,ADDNAN";
+	}
+
+	$cmd .= "$tot_in_bits ";
+	$cmd .= "$tot_out_bits ";
+
+	$cmd .= "VDEF:tot_in_bits_95th_pos=tot_in_bits,95,PERCENT ";
+	$cmd .= "VDEF:tot_out_bits_95th_pos=tot_out_bits,95,PERCENT ";
+
+	if ($outispositive) {
+		$cmd .= "CDEF:tot_in_bits_95th=tot_in_bits,POP,tot_in_bits_95th_pos,-1,* ";
+		$cmd .= "CDEF:tot_out_bits_95th=tot_out_bits,POP,tot_out_bits_95th_pos,1,* ";
+	} else {
+		$cmd .= "CDEF:tot_in_bits_95th=tot_in_bits,POP,tot_in_bits_95th_pos,1,* ";
+		$cmd .= "CDEF:tot_out_bits_95th=tot_out_bits,POP,tot_out_bits_95th_pos,-1,* ";
+	}
+
+	foreach ($knownlinks as $link) {
+		if ($outispositive) {
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in_bits_pos,-1,* ";
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out_bits_pos,1,* ";
+		} else {
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}out_bits={$link['tag']}_{$v6_el}out_bits_pos,-1,* ";
+			$cmd .= "CDEF:{$link['tag']}_{$v6_el}in_bits={$link['tag']}_{$v6_el}in_bits_pos,1,* ";
+		}
+	}
 }
 
 /* generate graph area/stack for inbound */
@@ -120,11 +133,11 @@ foreach ($knownlinks as $link) {
 	$i++;
 }
 
-if($show95th){
-        $cmd .= "LINE1:tot_in_bits_95th#FF0000 ";
-        $cmd .= "LINE1:tot_out_bits_95th#FF0000 ";
-        $cmd .= "GPRINT:tot_in_bits_95th_pos:'95th in %6.2lf%s' ";
-        $cmd .= "GPRINT:tot_out_bits_95th_pos:'95th out %6.2lf%s' ";
+if ($show95th && !$compat_rrdtool12) {
+	$cmd .= "LINE1:tot_in_bits_95th#FF0000 ";
+	$cmd .= "LINE1:tot_out_bits_95th#FF0000 ";
+	$cmd .= "GPRINT:tot_in_bits_95th_pos:'95th in %6.2lf%s' ";
+	$cmd .= "GPRINT:tot_out_bits_95th_pos:'95th out %6.2lf%s' ";
 }
 
 # zero line

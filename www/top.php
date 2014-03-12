@@ -14,6 +14,14 @@ if ($ntop > 200)
 
 $topas = getasstats_top($ntop);
 
+if (@$_GET['numhours']) {
+	$start = time() - $_GET['numhours']*3600;
+	$end = time();
+} else {
+	$start = "";
+	$end = "";
+}
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -81,10 +89,10 @@ echo join(" | ", $htmllinks);
 	</th>
 	<td>
 		<?php if ($showv6): ?>
-		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" width="581" height="207" border="0" /></a>
-		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" width="581" height="207" border="0" /></a>
+		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>&amp;start=<?=$start?>&amp;end=<?=$end?>" width="581" height="207" border="0" /></a>
+		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>&amp;start=<?=$start?>&amp;end=<?=$end?>" width="581" height="207" border="0" /></a>
 		<?php else: ?>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" width="581" height="189" border="0" /></a>
+		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>&amp;start=<?=$start?>&amp;end=<?=$end?>" width="581" height="189" border="0" /></a>
 		<?php endif; ?>
 	</td>
 </tr>

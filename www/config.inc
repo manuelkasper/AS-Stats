@@ -18,7 +18,9 @@ $hidelinkusagename  = true;	  # $showtitledetail will need to be true to allow t
 
 $whois = "/usr/bin/whois";
 $assetpath = "asset";
-$asset_cache_life ="604800"; # 604800 seconds = 7 days
+$asset_cache_life = "604800"; # 604800 seconds = 7 days
+
+$compat_rrdtool12 = false;	# compatibility with RRDtool 1.2 (show95th will not work if this is set)
 
 /* Custom links to be shown for each AS. You can use %as% as a
    placeholder for the ASN. */

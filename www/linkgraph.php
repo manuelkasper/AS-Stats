@@ -72,7 +72,7 @@ $cmd = "$rrdtool graph - " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
 if($showtitledetail && $_GET['dname'] != "")
-	$cmd .= "--title " . str_replace(' ','\ ',rawurldecode($_GET['dname'])) . " ";
+	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
 else
 	if (isset($_GET['v']) && is_numeric($_GET['v']))
 		$cmd .= "--title IPv" . $_GET['v'] . " ";
