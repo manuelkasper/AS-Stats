@@ -22340,6 +22340,7 @@
 23453	NPBI-NOC	NEW PEOPLES BANK, INC	US
 23454	AKAMAI-AS	Akamai Technologies, Inc.	US
 23455	AKAMAI-AS	Akamai Technologies, Inc.	US
+23456	TRANS-AS	IANA Reserved AS	US
 23457	BRAMPTON	City of Brampton	CA
 23458	DHH-AUTHORITY	Denver Health and Hospital Authority	US
 23459	MORINDA	Morinda, Inc.	US
