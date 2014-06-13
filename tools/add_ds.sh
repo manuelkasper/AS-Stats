@@ -1,5 +1,10 @@
 #!/bin/sh
 
+## YOU NEED TO EDIT add_ds_proc.pl BEFORE YOU RUN THIS!!
+## You need to edit the line:
+## my $newlinkname = 'NEWIDFROMKNOWNLINKSFILE';
+## to reflect the ID in the known links file
+
 A=`ls -1`
 
 for i in $A ; do
