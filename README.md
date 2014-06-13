@@ -37,6 +37,12 @@ Prerequisites
 - one or more routers than can generate NetFlow v8/v9 AS aggregation records
   or sFlow samples
 
+Considerations
+-------------
+
+Thoughts on a location for RRD files:
+RRD files are small in size, but there are a lot of them. You will see a performance gain on a filesystem like XFS over EXT3/4. Consider what filesystem you put the RRD files on if performance is a factor for your needs.
+
 
 Installation
 ------------
@@ -283,6 +289,48 @@ XML dump/restore feature is provided (add_ds_proc.pl, add_ds.sh). Note that
 asstatd.pl should be stopped while modifying RRD files, to avoid
 breaking them with concurrent modifications.
 
+The process to add a new link was lacking in info for me, so i have added this info here.
+
+Before you follow the below:
+* Make sure you stop the as-stat collector.
+* Take a backup of your whole RRD folder. That is the only way to roll back from this process.
+* This will only add one datasource at a time. If you are adding multiple new links, you will need to follow the below once for each new link you add
+
+Step one: Edit your known links file and add your new link (see above for syntax)
+For an example:
+10.1.17.10      33      router-newlink  Friendlyname     1F78B4  1
+
+Step two: Edit the script tools/add_ds_proc.pl
+
+Change this line:
+my $newlinkname = 'newlink';
+
+To have the same ID in your known links file:
+my $newlinkname = 'router-newlink';
+
+Step three: Edit the script tools/add_ds.sh
+
+Make sure the path to add_ds_proc.pl is correct
+
+Step four:
+cd into the rrd folder:
+cd rrd
+
+Step four:
+Run the script
+/path/to/add_ds.sh
+
+This will take a while (around 20 minutes) so go get a cup of coffee.
+
+Step five:
+Start the collector back up again, and watch for new graphs!
+
+
+You can also read the RRD files with the command
+rrdtool info file.rrd 
+Which will show you the data sourced in each one.
+
+
 
 Changing the RRAs
 -----------------
@@ -307,3 +355,4 @@ To do
 
 - rrd-extractstats.pl uses a lot of memory and could probably use some
   optimization.
+- Consider adding a command line parameter to add_ds_proc.pl and add_ds.sh for ease of adding new links.
