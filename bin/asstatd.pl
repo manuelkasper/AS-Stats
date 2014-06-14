@@ -6,6 +6,7 @@
 # cli params/rrd storage/sampling mods Steve Colam <steve@colam.co.uk>
 
 use strict;
+use 5.010;
 use IO::Select;
 use IO::Socket;
 use RRDs;
@@ -259,7 +260,7 @@ sub parse_netflow_v9_data_flowset {
 	my $datalen = length($flowsetdata);
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
-		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
+		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
 
 		$inoctets = 0;
 		$outoctets = 0;
@@ -312,11 +313,15 @@ sub parse_netflow_v9_data_flowset {
 				$ipversion = unpack("C", $cur_fldval);
 			} elsif ($cur_fldtype == 27 || $cur_fldtype == 28) {	# IPV6_SRC_ADDR/IPV6_DST_ADDR
 				$ipversion = 6;
+			} elsif ($cur_fldtype == 58) {  # SRC_VLAN
+				$vlanin = unpack("n", $cur_fldval);
+			} elsif ($cur_fldtype == 59) {  # SRC_VLAN
+				$vlanout = unpack("n", $cur_fldval);
 			}
 		}
 	
 		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
-			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow');
+			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow', $vlanin, $vlanout);
 		}
 	}
 }
@@ -400,7 +405,7 @@ sub parse_netflow_v10_data_flowset {
 	my $datalen = length($flowsetdata);
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
-		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion);
+		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
 
 		$inoctets = 0;
 		$outoctets = 0;
@@ -453,11 +458,15 @@ sub parse_netflow_v10_data_flowset {
 				$ipversion = unpack("C", $cur_fldval);
 			} elsif ($cur_fldtype == 27 || $cur_fldtype == 28) {	# IPV6_SRC_ADDR/IPV6_DST_ADDR
 				$ipversion = 6;
+			} elsif ($cur_fldtype == 58) {  # SRC_VLAN
+				$vlanin = unpack("n", $cur_fldval);
+			} elsif ($cur_fldtype == 59) {  # SRC_VLAN
+				$vlanout = unpack("n", $cur_fldval);
 			}
 		}
 	
 		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
-			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow');
+			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow', $vlanin, $vlanout);
 		}
 	}
 }
@@ -541,13 +550,22 @@ sub parse_sflow {
 		if ($dstas == $myas) {
 			$dstas = 0;
 		}
+
+		# Extract VLAN information
+		my ($vlanin, $vlanout);
+		if ($sFlowSample->{'SwitchSrcVlan'}) {
+			$vlanin = $sFlowSample->{'SwitchSrcVlan'};
+		}
+		if ($sFlowSample->{'SwitchDestVlan'}) {
+			$vlanout = $sFlowSample->{'SwitchDestVlan'};
+		}
 		
-		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow');
+		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout);
 	}
 }
 
 sub handleflow {
-	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion) = @_;
+	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
 		# don't care about internal traffic
@@ -564,14 +582,16 @@ sub handleflow {
 	if ($srcas == 0) {
 		$as = $dstas;
 		$direction = "out";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpout};
+		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpout . '/' . $vlanout};
+		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpout};
 	} elsif ($dstas == 0) {
 		$as = $srcas;
 		$direction = "in";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
+		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin};
+		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
-		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion);
-		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion);
+		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
+		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
 		return;
 	}
 	

@@ -1,4 +1,4 @@
-# Router IP		SNMP ifindex	tag				description		color	samplingrate
+# Router IP		SNMP ifindex[/VLAN]	tag				description		color	samplingrate
 # note: tabs must be used to separate fields (not spaces)
 # max. length for tag is 12 characters; allowed characters: a-z A-Z 0-9 _
 192.0.2.1		15				uplink1			Uplink 1		A6CEE3	1
@@ -8,3 +8,4 @@
 192.0.2.2		42				peering1		IXP 1			FB9A99	1
 192.0.2.2		45				peering2		IXP 2			E31A1C	1
 192.0.2.3		6				peering3		IXP 3			FDBF6F	2048
+192.0.2.3		6/42				uplink5			Uplink 5 via VLAN 42	F86FFD	2048
