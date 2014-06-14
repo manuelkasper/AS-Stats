@@ -565,7 +565,7 @@ sub parse_sflow {
 }
 
 sub handleflow {
-	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout) = @_;
+	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
 		# don't care about internal traffic
