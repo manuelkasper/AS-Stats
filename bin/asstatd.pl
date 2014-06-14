@@ -582,12 +582,12 @@ sub handleflow {
 	if ($srcas == 0) {
 		$as = $dstas;
 		$direction = "out";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpout . '/' . $vlanout};
+		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpout . '/' . $vlanout} if defined($vlanout);
 		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpout};
 	} elsif ($dstas == 0) {
 		$as = $srcas;
 		$direction = "in";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin};
+		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin} if defined($vlanin);
 		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
 		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
