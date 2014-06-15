@@ -1,3 +1,10 @@
+## post 1.5
+
+* Added support for multiple links on one ifIndex, based on VLANs. Only
+  sFlow, Netflow v9 and v10 (IPFIX) support this. Obviously your router
+  needs to provide the information. Just add "/<vlan>" to the ifIndex in
+  your knownlinks file.
+
 ## 1.5
 
 * Merged netflow-asstatd.pl and sflow-asstatd.pl into one script so

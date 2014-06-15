@@ -30,7 +30,7 @@ scripts.
 Prerequisites
 -------------
 
-- Perl 5.8
+- Perl 5.10
 - RRDtool 1.2 (with Perl "RRDs" library)
 - if using sFlow: the Net::sFlow module (CPAN)
 - web server with PHP 5
