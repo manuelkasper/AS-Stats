@@ -147,8 +147,12 @@ foreach ($knownlinks as $link) {
     echo "<tr><td style=\"border: 4px solid #fff;\">";
 
     echo "<table style=\"border-collapse: collapse; margin: 0; padding: 0\"><tr>";
-    echo "<td width=\"9\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
-    echo "<td width=\"9\" height=\"18\" style=\"opacity: 0.73; background-color: #{$link['color']}\">&nbsp;</td>";
+    if (isset($brighten_negative) && $brighten_negative) {
+        echo "<td width=\"9\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
+        echo "<td width=\"9\" height=\"18\" style=\"opacity: 0.73; background-color: #{$link['color']}\">&nbsp;</td>";
+    } else {
+        echo "<td width=\"18\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
+    }
     echo "</tr></table>";
 
     echo "</td><td>&nbsp;" . $link['descr'] . "</td></tr>\n";
