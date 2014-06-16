@@ -11,6 +11,7 @@ use IO::Select;
 use IO::Socket;
 use RRDs;
 use Getopt::Std;
+use Scalar::Util qw(looks_like_number);
 
 my %knownlinks;
 my %link_samplingrates;
@@ -87,6 +88,7 @@ sub REAPER {
 
 sub TERM {
 	print "SIGTERM received\n";
+	flush_cache(1);
 	exit 0;
 }
 
@@ -515,9 +517,10 @@ sub parse_sflow {
 			$ipversion = 6;
 		} else {
 			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
-			
+
 			# make one more attempt at figuring out the IP version
-			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
+			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) && 
+				looks_like_number($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
 				$sFlowSample->{'GatewayIpVersionNextHopRouter'} == 2) ||
 				(defined($sFlowSample->{'HeaderType'}) && $sFlowSample->{'HeaderType'} eq '86dd')) {
 				$ipversion = 6;
@@ -625,7 +628,8 @@ sub handleflow {
 }
 
 sub flush_cache {
-	if ($childrunning || ((time - $ascache_lastflush) < $ascache_flush_interval)) {
+	my $force = shift;
+	if (!defined($force) && ($childrunning || ((time - $ascache_lastflush) < $ascache_flush_interval))) {
 		# can't/don't want to flush cache right now
 		return;
 	}
@@ -639,17 +643,21 @@ sub flush_cache {
 	} elsif ($pid != 0) {
 		# in parent
 		$ascache_lastflush = time;
-		for (keys %$ascache) {
-			if ($_ % 10 == $ascache_flush_number % 10) {
-				delete $ascache->{$_};
+		if(!defined($force)){
+			for (keys %$ascache) {
+				if ($_ % 10 == $ascache_flush_number % 10) {
+					delete $ascache->{$_};
+				}
 			}
+		}else{
+			$ascache = ();
 		}
 		$ascache_flush_number++;
 		return;
 	}
 
 	while (my ($as, $cacheent) = each(%$ascache)) {
-		if ($as % 10 == $ascache_flush_number % 10) {
+		if (defined($force) || $as % 10 == $ascache_flush_number % 10) {
 			#print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
 		
 			my $rrdfile = getrrdfile($as, $cacheent->{updatets});

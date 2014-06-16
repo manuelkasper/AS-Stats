@@ -22,6 +22,8 @@ $asset_cache_life = "604800"; # 604800 seconds = 7 days
 
 $compat_rrdtool12 = false;	# compatibility with RRDtool 1.2 (show95th will not work if this is set)
 
+$decolore = true; #decolore the "negative" part of graphs (only usefull if $outispositive is true)
+
 /* Custom links to be shown for each AS. You can use %as% as a
    placeholder for the ASN. */
 $customlinks = array(
