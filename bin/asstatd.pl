@@ -11,6 +11,7 @@ use IO::Select;
 use IO::Socket;
 use RRDs;
 use Getopt::Std;
+use Scalar::Util qw(looks_like_number);
 
 my %knownlinks;
 my %link_samplingrates;
@@ -515,9 +516,10 @@ sub parse_sflow {
 			$ipversion = 6;
 		} else {
 			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
-			
+
 			# make one more attempt at figuring out the IP version
-			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
+			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) && 
+				looks_like_number($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
 				$sFlowSample->{'GatewayIpVersionNextHopRouter'} == 2) ||
 				(defined($sFlowSample->{'HeaderType'}) && $sFlowSample->{'HeaderType'} eq '86dd')) {
 				$ipversion = 6;
