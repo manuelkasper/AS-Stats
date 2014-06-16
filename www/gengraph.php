@@ -107,7 +107,7 @@ if ($compat_rrdtool12) {
 /* generate graph area/stack for inbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	if ($outispositive && $decolore)
+	if ($outispositive && (!isset($brighten_negative) || $brighten_negative))
 		$col = $link['color'] . "BB";
 	else
 		$col = $link['color'];
@@ -122,7 +122,7 @@ foreach ($knownlinks as $link) {
 /* generate graph area/stack for outbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	if ($outispositive)
+	if ($outispositive || !(!isset($brighten_negative) || $brighten_negative))
 		$col = $link['color'];
 	else
 		$col = $link['color'] . "BB";
