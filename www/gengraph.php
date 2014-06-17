@@ -13,8 +13,8 @@ if (!preg_match("/^[0-9a-zA-Z]+$/", $as))
 
 header("Content-Type: image/png");
 
-$width = 500;
-$height = 300;
+$width = $default_graph_width;
+$height = $default_graph_height;
 if (isset($_GET['width']))
 	$width = (int)$_GET['width'];
 if (isset($_GET['height']))
@@ -26,14 +26,27 @@ if (@$_GET['v'] == 6)
 $knownlinks = getknownlinks();
 $rrdfile = getRRDFileForAS($as);
 
+if ($compat_rrdtool12) {
+	/* cannot use full-size-mode - must estimate height/width */
+	$height -= 65;
+	$width -= 81;
+	if ($vertical_label)
+		$width -= 16;
+}
+
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
 
-if($outispositive)
-	$cmd .= "--vertical-label '<- IN | OUT ->' ";
-else
-	$cmd .= "--vertical-label '<- OUT | IN ->' ";
+if (!$compat_rrdtool12)
+	$cmd .= "--full-size-mode ";
+
+if ($vertical_label) {
+	if($outispositive)
+		$cmd .= "--vertical-label '<- IN | OUT ->' ";
+	else
+		$cmd .= "--vertical-label '<- OUT | IN ->' ";
+}
 
 if($showtitledetail && $_GET['dname'] != "")
 	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
@@ -107,7 +120,7 @@ if ($compat_rrdtool12) {
 /* generate graph area/stack for inbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	if ($outispositive && (!isset($brighten_negative) || $brighten_negative))
+	if ($outispositive && $brighten_negative)
 		$col = $link['color'] . "BB";
 	else
 		$col = $link['color'];
@@ -122,7 +135,7 @@ foreach ($knownlinks as $link) {
 /* generate graph area/stack for outbound */
 $i = 0;
 foreach ($knownlinks as $link) {
-	if ($outispositive || !(!isset($brighten_negative) || $brighten_negative))
+	if ($outispositive || !$brighten_negative)
 		$col = $link['color'];
 	else
 		$col = $link['color'] . "BB";

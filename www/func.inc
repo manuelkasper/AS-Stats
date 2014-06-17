@@ -5,6 +5,7 @@
  * written by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
  */
 
+require_once("config_defaults.inc");
 require_once('config.inc');
 
 /* make sure we have enough memory, as some pages can be quite memory intensive */

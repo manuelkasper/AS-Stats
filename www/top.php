@@ -89,10 +89,10 @@ echo join(" | ", $htmllinks);
 	</th>
 	<td>
 		<?php if ($showv6): ?>
-		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="597" height="207" border="0" /></a>
-		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="597" height="207" border="0" /></a>
+		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
+		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
 		<?php else: ?>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=500&amp;height=150&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="581" height="189" border="0" /></a>
+		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
 		<?php endif; ?>
 	</td>
 </tr>
@@ -108,7 +108,7 @@ foreach ($knownlinks as $link) {
 	echo "<tr><td style=\"border: 4px solid #fff;\">";
 	
 	echo "<table style=\"border-collapse: collapse; margin: 0; padding: 0\"><tr>";
-        if (!isset($brighten_negative) || $brighten_negative) {
+        if ($brighten_negative) {
 		echo "<td width=\"9\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
 		echo "<td width=\"9\" height=\"18\" style=\"opacity: 0.73; background-color: #{$link['color']}\">&nbsp;</td>";
 	} else {

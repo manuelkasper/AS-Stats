@@ -58,8 +58,8 @@ foreach ($asstats as $as => $totaldata) {
 /* now make a beautiful graph :) */
 header("Content-Type: image/png");
 
-$width = 500;
-$height = 300;
+$width = $default_graph_width;
+$height = $default_graph_height;
 if ($_GET['width'])
 	$width = (int)$_GET['width'];
 if ($_GET['height'])
@@ -67,9 +67,18 @@ if ($_GET['height'])
 
 $knownlinks = getknownlinks();
 
+if ($compat_rrdtool12) {
+	/* cannot use full-size-mode - must estimate height/width */
+	$height -= 205;
+	$width -= 81;
+}
+
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
 	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
+
+if (!$compat_rrdtool12)
+	$cmd .= "--full-size-mode ";
 
 if($showtitledetail && $_GET['dname'] != "")
 	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
