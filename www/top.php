@@ -108,7 +108,7 @@ foreach ($knownlinks as $link) {
 	echo "<tr><td style=\"border: 4px solid #fff;\">";
 	
 	echo "<table style=\"border-collapse: collapse; margin: 0; padding: 0\"><tr>";
-        if (isset($brighten_negative) && $brighten_negative) {
+        if (!isset($brighten_negative) || $brighten_negative) {
 		echo "<td width=\"9\" height=\"18\" style=\"background-color: #{$link['color']}\">&nbsp;</td>";
 		echo "<td width=\"9\" height=\"18\" style=\"opacity: 0.73; background-color: #{$link['color']}\">&nbsp;</td>";
 	} else {
