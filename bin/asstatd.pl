@@ -89,7 +89,6 @@ sub REAPER {
 sub TERM {
 	print "SIGTERM received\n";
 	flush_cache(1);
-	while (wait() != -1) {}
 	exit 0;
 }
 
