@@ -41,7 +41,7 @@ my $sflow_server_port = 6343;
 use vars qw/ %opt /;
 getopts('r:p:P:k:a:n', \%opt);
 
-my $usage = "$0 [-rpPkan]\n".
+my $usage = "$0 [-rpPka]\n".
 	"\t-r <path to RRD files>\n".
 	"\t(-p <NetFlow UDP listen port - default $server_port, use 0 to disable NetFlow)\n".
 	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
