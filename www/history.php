@@ -13,7 +13,12 @@ $as = str_replace('as','',str_replace(' ','',strtolower($_GET['as'])));
 if ($as)
 	$asinfo = getASInfo($as);
 
-$rrdfile = getRRDFileForAS($as);
+if(isset($_GET['peerusage']) && $_GET['peerusage'] == '1')
+	$peerusage = 1;
+else
+	$peerusage = 0;
+
+$rrdfile = getRRDFileForAS($as, $peerusage);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -31,7 +36,7 @@ $rrdfile = getRRDFileForAS($as);
 <div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($as): ?>
-<div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
+<div class="pgtitle">History for <?php if($peerusage == 1) echo "peer "; ?>AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 	<?php if (!empty($customlinks)): ?>
 	<div class="customlinks">
 	<?php 
@@ -51,37 +56,37 @@ $rrdfile = getRRDFileForAS($as);
 <?php else: ?>
 <div class="title">4 Hourly</div>
 <?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 4 * 3600, time(), 'hourly graph', 'detailgraph', true);
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph', true);
 if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 4 * 3600, time(), 'hourly graph', 'detailgraph2', true);
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph2', true);
 ?>
 
 <div class="title">Daily</div>
 <?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 24 * 3600, time(), 'daily graph', 'detailgraph', true);
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 24 * 3600, time(), $peerusage, 'daily graph', 'detailgraph', true);
 if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 24 * 3600, time(), 'daily graph', 'detailgraph2', true);
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 24 * 3600, time(), $peerusage, 'daily graph', 'detailgraph2', true);
 ?>
 
 <div class="title">Weekly</div>
 <?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 7 * 86400, time(), 'weekly graph', 'detailgraph', true);
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 7 * 86400, time(), $peerusage, 'weekly graph', 'detailgraph', true);
 if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 7 * 86400, time(), 'weekly graph', 'detailgraph2', true);
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 7 * 86400, time(), $peerusage, 'weekly graph', 'detailgraph2', true);
 ?>
 
 <div class="title">Monthly</div>
 <?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 30 * 86400, time(), 'monthly graph', 'detailgraph', true);
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 30 * 86400, time(), $peerusage, 'monthly graph', 'detailgraph', true);
 if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 30 * 86400, time(), 'monthly graph', 'detailgraph2', true);
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 30 * 86400, time(), $peerusage, 'monthly graph', 'detailgraph2', true);
 ?>
 
 <div class="title">Yearly</div>
 <?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 365 * 86400, time(), 'yearly graph', 'detailgraph', true);
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 365 * 86400, time(), $peerusage, 'yearly graph', 'detailgraph', true);
 if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 365 * 86400, time(), 'yearly graph', 'detailgraph2', true);
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 365 * 86400, time(), $peerusage, 'yearly graph', 'detailgraph2', true);
 ?>
 
 <?php endif; ?>

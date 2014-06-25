@@ -7,12 +7,15 @@
 
 require_once('func.inc');
 
+if(!isset($peerusage))
+	$peerusage = 0;
+
 if (isset($_GET['n']))
 	$ntop = (int)$_GET['n'];
 if ($ntop > 200)
 	$ntop = 200;
 
-$topas = getasstats_top($ntop);
+$topas = getasstats_top($ntop, $peerusage);
 
 if (@$_GET['numhours']) {
 	$start = time() - $_GET['numhours']*3600;
@@ -29,7 +32,7 @@ if (@$_GET['numhours']) {
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Refresh" content="300" />
-	<title>Top <?php echo $ntop; ?> AS</title>
+	<title>Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -43,7 +46,7 @@ Number of AS:
 <?php include('headermenu.inc'); ?>
 </form>
 </div>
-<div class="pgtitle">Top <?php echo $ntop; ?> AS</div>
+<div class="pgtitle">Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></div>
 
 <table class="astable">
 
@@ -89,9 +92,9 @@ echo join(" | ", $htmllinks);
 	</th>
 	<td>
 		<?php
-		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end);
+		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage);
 		if ($showv6)
-			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end);
+			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end, $peerusage);
 		?>
 	</td>
 </tr>
