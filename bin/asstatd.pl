@@ -509,7 +509,7 @@ sub parse_sflow {
 			#print "Invalid interface index $snmpin/$snmpout\n";
 			next;
 		}
-		
+
 		my $noctets;
 		if ($sFlowSample->{'IPv4Packetlength'}) {
 			$noctets = $sFlowSample->{'IPv4Packetlength'};
@@ -563,7 +563,7 @@ sub parse_sflow {
 		if ($sFlowSample->{'SwitchDestVlan'}) {
 			$vlanout = $sFlowSample->{'SwitchDestVlan'};
 		}
-		
+
 		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout);
 	}
 }
@@ -577,7 +577,7 @@ sub handleflow {
 	}
 
 	#print "$srcas => $dstas ($noctets octets, version $ipversion, snmpin $snmpin, snmpout $snmpout)\n";
-	
+
 	# determine direction and interface alias name (if known)
 	my $direction;
 	my $ifalias;
@@ -594,8 +594,8 @@ sub handleflow {
 		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin} if defined($vlanin);
 		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
-		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
-		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
+		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout);
+		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout);
 		return;
 	}
 	
@@ -675,7 +675,7 @@ sub flush_cache {
 				push(@templatearg, $dsname);
 				push(@args, $value * $cursamplingrate);
 			}
-		
+
 		 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
 		 		$cacheent->{updatets} . ":" . join(':', @args));
 		 	my $ERR = RRDs::error;
