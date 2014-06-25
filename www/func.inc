@@ -95,11 +95,17 @@ function getknownlinks() {
 	return $knownlinks;
 }
 
-function getasstats_top($ntop) {
-	global $daystatsfile;
+function getasstats_top($ntop, $peer = 0) {
+	if($peer == 0){
+		global $daystatsfile;
+		$statfile = $daystatsfile;
+	}else{
+		global $daypeerstatsfile;
+		$statfile = $daypeerstatsfile;
+	}
 	
 	/* first step: walk the data for all ASes to determine the top 5 for the given link */
-	$fd = fopen($daystatsfile, "r");
+	$fd = fopen($statfile, "r");
 	if (!$fd)
 		return array();
 	$cols = explode("\t", trim(fgets($fd)));
@@ -152,9 +158,10 @@ function format_bytes($bytes) {
 		return "$bytes bytes";
 }
 
-function getRRDFileForAS($as) {
+function getRRDFileForAS($as, $peer = 0) {
 	global $rrdpath;
-	return "$rrdpath/" . sprintf("%02x", $as % 256) . "/$as.rrd";
+	$prefix = ($peer == 1) ? "$rrdpath/peeras" : "$rrdpath";
+	return "$prefix/" . sprintf("%02x", $as % 256) . "/$as.rrd";
 }
 
 function getASSET($asset) {
@@ -221,20 +228,20 @@ function clearCacheFileASSET($asset) {
 }
 
 # return the html used in top.php : <a href=blabla><img src=blabla/></url>
-function getHTMLUrl($as, $ipversion, $desc, $start, $end){
-	$img = getHTMLImg($as, $ipversion, $desc, $start, $end, '', '', false);
-	$result = "<a href='history.php?as=$as&v=$ipversion' target='_blank'>$img</a>";
+function getHTMLUrl($as, $ipversion, $desc, $start, $end, $peerusage){
+	$img = getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, '', '', false);
+	$result = "<a href='history.php?as=$as&peerusage=$peerusage&v=$ipversion' target='_blank'>$img</a>";
 	return($result);
 }
 
 # return the html used in history.php (for example) : <img src=blabla/>
-function getHTMLImg($as, $ipversion, $desc, $start, $end, $alt, $class, $history = false){
+function getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, $alt, $class, $history = false){
 	global $top_graph_width;
 	global $top_graph_height;
 
 	$dname = rawurlencode("AS$as - $desc - IPV$ipversion");
 
-	$result = "<img alt='$alt' class='$class' src='gengraph.php?v=$ipversion&as=$as&dname=$dname&start=$start&end=$end";
+	$result = "<img alt='$alt' class='$class' src='gengraph.php?v=$ipversion&as=$as&peerusage=$peerusage&dname=$dname&start=$start&end=$end";
 	if(!$history)
 		$result .= "&width=$top_graph_width&height=$top_graph_height&nolegend=1";
 	$result .= "'";
