@@ -8,7 +8,6 @@
 use strict;
 use RRDs;
 use File::Find;
-use File::Find::Rule;
 
 if ($#ARGV != 2) {
 	die("Usage: $0 <path to RRD file directory> <path to known links file> outfile\n");
@@ -27,7 +26,12 @@ my @links = values %knownlinks;
 # walk through all RRD files in the given path and extract stats for all links
 # from them; write the stats to a text file, sorted by total traffic
 
-my @rrdfiles = File::Find::Rule->maxdepth(2)->file->in($rrdpath);
+my @rrdfiles;
+find(sub {
+	if (-f $_) {
+		push(@rrdfiles, $File::Find::name);
+	}
+}, $rrdpath);
 
 my $astraffic = {};
 
