@@ -219,3 +219,28 @@ function clearCacheFileASSET($asset) {
 		unlink($file);
 	}
 }
+
+# return the html used in top.php : <a href=blabla><img src=blabla/></url>
+function getHTMLUrl($as, $ipversion, $desc, $start, $end, $peerusage){
+	$img = getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, '', '', false);
+	$result = "<a href='history.php?as=$as&peerusage=$peerusage&v=$ipversion' target='_blank'>$img</a>";
+	return($result);
+}
+
+# return the html used in history.php (for example) : <img src=blabla/>
+function getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, $alt, $class, $history = false){
+	global $top_graph_width;
+	global $top_graph_height;
+
+	$dname = rawurlencode("AS$as - $desc - IPV$ipversion");
+
+	$result = "<img alt='$alt' class='$class' src='gengraph.php?v=$ipversion&as=$as&peerusage=$peerusage&dname=$dname&start=$start&end=$end";
+	if(!$history)
+		$result .= "&width=$top_graph_width&height=$top_graph_height&nolegend=1";
+	$result .= "'";
+
+	if(!$history)
+		$result .= " width='$top_graph_width' height='$top_graph_height' border='0'";
+	$result .= "/>";
+	return($result);
+}
