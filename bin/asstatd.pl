@@ -39,18 +39,20 @@ my $v10_templates = {};
 my $sflow_server_port = 6343;
 
 use vars qw/ %opt /;
-getopts('r:p:P:k:a:', \%opt);
+getopts('r:p:P:k:a:n', \%opt);
 
 my $usage = "$0 [-rpPka]\n".
 	"\t-r <path to RRD files>\n".
 	"\t(-p <NetFlow UDP listen port - default $server_port, use 0 to disable NetFlow)\n".
 	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
 	"\t-k <path to known links file>\n".
-	"\t-a <your own AS number> - only required for sFlow\n";
+	"\t-a <your own AS number> - only required for sFlow\n".
+	"\t-n - enable peer-as statistics\n";
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
 my $myas = $opt{'a'};
+my $peerasstats = $opt{'n'};
 
 die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile));
 
@@ -89,6 +91,7 @@ sub REAPER {
 sub TERM {
 	print "SIGTERM received\n";
 	flush_cache(1);
+	while (wait() != -1) {}
 	exit 0;
 }
 
@@ -508,7 +511,7 @@ sub parse_sflow {
 			#print "Invalid interface index $snmpin/$snmpout\n";
 			next;
 		}
-		
+
 		my $noctets;
 		if ($sFlowSample->{'IPv4Packetlength'}) {
 			$noctets = $sFlowSample->{'IPv4Packetlength'};
@@ -562,13 +565,41 @@ sub parse_sflow {
 		if ($sFlowSample->{'SwitchDestVlan'}) {
 			$vlanout = $sFlowSample->{'SwitchDestVlan'};
 		}
-		
+
+		# srcpeeras is the one who sent me data
+		# dstpeeras is the first one to which you'll send the data
+		# so, dstpeeras is the first entry in array
+		# if the array is now empty (poped before), then take $dstas
+		my $srcpeeras = ($sFlowSample->{'GatewayAsSourcePeer'}) ? $sFlowSample->{'GatewayAsSourcePeer'} : 0;
+		my $dstpeeras = 0;
+
+		if ($sFlowSample->{'GatewayDestAsPaths'}) {
+			$dstpeeras = @{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}}[0];
+			if (!$dstpeeras) {
+				$dstpeeras = 0;
+			}
+		}
+		if($dstpeeras == 0 && $dstas != 0){
+			$dstpeeras = $dstas;
+		}
+
+		if ($srcpeeras == $myas) {
+			$srcpeeras = 0;
+		}
+		if ($dstpeeras== $myas) {
+			$dstpeeras = 0;
+		}
+
 		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout);
+
+		if($peerasstats && ($srcpeeras != 0 || $dstpeeras != 0)){
+			handleflow($ipaddr, $noctets, $srcpeeras, $dstpeeras, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout, 1);
+		}
 	}
 }
 
 sub handleflow {
-	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout) = @_;
+	my ($routerip, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout, $peeras) = @_;
 	
 	if ($srcas == 0 && $dstas == 0) {
 		# don't care about internal traffic
@@ -576,7 +607,7 @@ sub handleflow {
 	}
 
 	#print "$srcas => $dstas ($noctets octets, version $ipversion, snmpin $snmpin, snmpout $snmpout)\n";
-	
+
 	# determine direction and interface alias name (if known)
 	my $direction;
 	my $ifalias;
@@ -593,8 +624,8 @@ sub handleflow {
 		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin} if defined($vlanin);
 		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
 	} else {
-		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
-		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
+		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout, $peeras);
+		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout, $peeras);
 		return;
 	}
 	
@@ -611,16 +642,17 @@ sub handleflow {
 	}
 	
 	# put it into the cache
-	if (!$ascache->{$as}) {
-		$ascache->{$as} = {createts => time};
+	my $name = ($peeras) ? "${as}_peer" : $as;
+	if (!$ascache->{$name}) {
+		$ascache->{$name} = {createts => time};
 	}
 	
-	$ascache->{$as}->{$dsname} += $noctets;
-	$ascache->{$as}->{updatets} = time;
+	$ascache->{$name}->{$dsname} += $noctets;
+	$ascache->{$name}->{updatets} = time;
 	
-	if ($ascache->{$as}->{updatets} == $ascache_lastflush) {
+	if ($ascache->{$name}->{updatets} == $ascache_lastflush) {
 		# cheat a bit here
-		$ascache->{$as}->{updatets}++;
+		$ascache->{$name}->{updatets}++;
 	}
 	
 	# now flush the cache, if necessary
@@ -645,8 +677,11 @@ sub flush_cache {
 		$ascache_lastflush = time;
 		if(!defined($force)){
 			for (keys %$ascache) {
-				if ($_ % 10 == $ascache_flush_number % 10) {
-					delete $ascache->{$_};
+				my $as= $_;
+				$as =~ s/_peer//;
+				if ($as % 10 == $ascache_flush_number % 10) {
+					delete $ascache->{$as};
+					delete $ascache->{"${as}_peer"};
 				}
 			}
 		}else{
@@ -656,11 +691,15 @@ sub flush_cache {
 		return;
 	}
 
-	while (my ($as, $cacheent) = each(%$ascache)) {
+	while (my ($entry, $cacheent) = each(%$ascache)) {
+		my $as = $entry;
+		$as =~ s/_peer//;
+
 		if (defined($force) || $as % 10 == $ascache_flush_number % 10) {
 			#print "$$: flushing data for AS $as ($cacheent->{updatets})\n";
 		
-			my $rrdfile = getrrdfile($as, $cacheent->{updatets});
+			my $peeras = ($entry eq $as) ? 0 : 1;
+			my $rrdfile = getrrdfile($as, $cacheent->{updatets}, $peeras);
 			my @templatearg;
 			my @args;
 		
@@ -674,7 +713,7 @@ sub flush_cache {
 				push(@templatearg, $dsname);
 				push(@args, $value * $cursamplingrate);
 			}
-		
+
 		 	RRDs::update($rrdfile, "--template", join(':', @templatearg),
 		 		$cacheent->{updatets} . ":" . join(':', @args));
 		 	my $ERR = RRDs::error;
@@ -692,11 +731,17 @@ sub flush_cache {
 sub getrrdfile {
 	my $as = shift;
 	my $startts = shift;
+	my $peeras = shift;
 	$startts--;
 
+	if(! -d "$rrdpath/peeras"){
+		mkdir("$rrdpath/peeras");
+	}
+
+	my $prefix = ($peeras) ? "$rrdpath/peeras" : $rrdpath;
 	# we create 256 directories and store RRD files based on the lower
 	# 8 bytes of the AS number
-	my $dirname = "$rrdpath/" . sprintf("%02x", $as % 256);
+	my $dirname = "$prefix/" . sprintf("%02x", $as % 256);
 	if (! -d $dirname) {
 		# need to create directory
 		mkdir($dirname);

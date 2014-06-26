@@ -23,8 +23,13 @@ $v6_el = "";
 if (@$_GET['v'] == 6)
 	$v6_el = "v6_";
 
+if(isset($_GET['peerusage']) && $_GET['peerusage'] == '1')
+	$peerusage = 1;
+else
+	$peerusage = 0;
+
 $knownlinks = getknownlinks();
-$rrdfile = getRRDFileForAS($as);
+$rrdfile = getRRDFileForAS($as, $peerusage);
 
 if ($compat_rrdtool12) {
 	/* cannot use full-size-mode - must estimate height/width */

@@ -13,7 +13,12 @@ $as = str_replace('as','',str_replace(' ','',strtolower($_GET['as'])));
 if ($as)
 	$asinfo = getASInfo($as);
 
-$rrdfile = getRRDFileForAS($as);
+if(isset($_GET['peerusage']) && $_GET['peerusage'] == '1')
+	$peerusage = 1;
+else
+	$peerusage = 0;
+
+$rrdfile = getRRDFileForAS($as, $peerusage);
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -31,7 +36,7 @@ $rrdfile = getRRDFileForAS($as);
 <div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($as): ?>
-<div class="pgtitle">History for AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
+<div class="pgtitle">History for <?php if($peerusage == 1) echo "peer "; ?>AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 	<?php if (!empty($customlinks)): ?>
 	<div class="customlinks">
 	<?php 
@@ -50,44 +55,40 @@ $rrdfile = getRRDFileForAS($as);
 <p>No data found for AS <?php echo $as; ?></p>
 <?php else: ?>
 <div class="title">4 Hourly</div>
-<?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="weekly graph" />
-<?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 4*3600);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" alt="weekly graph" />
-<?php endif; ?>
+<?php
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph', true);
+if ($showv6)
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph2', true);
+?>
 
 <div class="title">Daily</div>
-<?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="daily graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="daily graph" />
-<?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" alt="daily graph" />
-<?php endif; ?>
+<?php
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 24 * 3600, time(), $peerusage, 'daily graph', 'detailgraph', true);
+if ($showv6)
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 24 * 3600, time(), $peerusage, 'daily graph', 'detailgraph2', true);
+?>
 
 <div class="title">Weekly</div>
-<?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="weekly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="weekly graph" />
-<?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 7*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" alt="weekly graph" />
-<?php endif; ?>
+<?php
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 7 * 86400, time(), $peerusage, 'weekly graph', 'detailgraph', true);
+if ($showv6)
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 7 * 86400, time(), $peerusage, 'weekly graph', 'detailgraph2', true);
+?>
 
 <div class="title">Monthly</div>
-<?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="monthly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="monthly graph" />
-<?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 30*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" alt="monthly graph" />
-<?php endif; ?>
+<?php
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 30 * 86400, time(), $peerusage, 'monthly graph', 'detailgraph', true);
+if ($showv6)
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 30 * 86400, time(), $peerusage, 'monthly graph', 'detailgraph2', true);
+?>
 
 <div class="title">Yearly</div>
-<?php if ($showv6): ?>
-<img class="detailgraph" src="gengraph.php?v=4&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>" alt="yearly graph" />
-<img class="detailgraph2" src="gengraph.php?v=6&amp;as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>" alt="yearly graph" />
-<?php else: ?>
-<img class="detailgraph" src="gengraph.php?as=<?php echo $as; ?>&amp;start=<?php echo (time() - 365*86400);?>&amp;end=<?php echo time(); ?>&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>" alt="yearly graph" />
-<?php endif; ?>
+<?php
+echo getHTMLImg($as, 4, $asinfo['descr'], time() - 365 * 86400, time(), $peerusage, 'yearly graph', 'detailgraph', true);
+if ($showv6)
+	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 365 * 86400, time(), $peerusage, 'yearly graph', 'detailgraph2', true);
+?>
+
 <?php endif; ?>
 <?php else: ?>
 

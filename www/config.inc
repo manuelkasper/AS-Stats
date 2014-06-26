@@ -6,6 +6,9 @@ $rrdpath = "/data/as-stats/rrd";
 $daystatsfile = "/data/as-stats/asstats_day.txt";
 $rrdtool = "/usr/bin/rrdtool";
 
+$daypeerstatsfile = "/data/as-stats/peerasstats_day.txt";
+$showpeeras = true;
+
 $asinfofile = "asinfo.txt";
 $knownlinksfile = "/data/as-stats/conf/knownlinks";
 $outispositive = true;

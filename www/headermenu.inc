@@ -7,6 +7,14 @@ else:
 	?><a href="top.php">Top AS</a> | <?php 
 endif;
 
+if($showpeeras == true){
+	if ($dpagename == "peerusage"):
+		?><a href="peerusage.php" class="selected">Top Peer AS</a> | <?php
+	else:
+		?><a href="peerusage.php">Top AS Peer<a> | <?php
+	endif;
+}
+
 
 if ($dpagename == "top" && @$_GET['numhours'] == 4): 
 	?><a href="top.php?numhours=4" class="selected">4 Hour</a> | <?php
@@ -34,7 +42,6 @@ if ($dpagename == "asset"):
 else:
 	?><a href="asset.php">View an AS-SET</a> | <?php 
 endif;
-
 
 if ($dpagename == "linkusage"): 
 	?><a href="linkusage.php" class="selected">Link usage</a><?php

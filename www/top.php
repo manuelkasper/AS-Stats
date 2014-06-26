@@ -7,12 +7,15 @@
 
 require_once('func.inc');
 
+if(!isset($peerusage))
+	$peerusage = 0;
+
 if (isset($_GET['n']))
 	$ntop = (int)$_GET['n'];
 if ($ntop > 200)
 	$ntop = 200;
 
-$topas = getasstats_top($ntop);
+$topas = getasstats_top($ntop, $peerusage);
 
 if (@$_GET['numhours']) {
 	$start = time() - $_GET['numhours']*3600;
@@ -29,7 +32,7 @@ if (@$_GET['numhours']) {
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Refresh" content="300" />
-	<title>Top <?php echo $ntop; ?> AS</title>
+	<title>Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -43,7 +46,7 @@ Number of AS:
 <?php include('headermenu.inc'); ?>
 </form>
 </div>
-<div class="pgtitle">Top <?php echo $ntop; ?> AS</div>
+<div class="pgtitle">Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></div>
 
 <table class="astable">
 
@@ -88,12 +91,11 @@ echo join(" | ", $htmllinks);
 		</div>
 	</th>
 	<td>
-		<?php if ($showv6): ?>
-		<a href="history.php?v=4&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;v=4&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV4"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
-		<a href="history.php?v=6&amp;as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;v=6&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . " - IPV6"); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
-		<?php else: ?>
-		<a href="history.php?as=<?php echo $as; ?>" target="_blank"><img alt="AS graph" src="gengraph.php?as=<?php echo $as; ?>&amp;width=<?php echo $top_graph_width ?>&amp;height=<?php echo $top_graph_height ?>&amp;nolegend=1&amp;dname=<?php echo rawurlencode("AS" . $as . " - " . $asinfo['descr'] . ""); ?>&amp;start=<?php echo $start; ?>&amp;end=<?php echo $end; ?>" width="<?php echo $top_graph_width ?>" height="<?php echo $top_graph_height ?>" border="0" /></a>
-		<?php endif; ?>
+		<?php
+		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage);
+		if ($showv6)
+			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end, $peerusage);
+		?>
 	</td>
 </tr>
 <?php $i++; endforeach; ?>

@@ -41,7 +41,7 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 	<td>
 		<?php if ($showv6): ?>
 		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=4&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV4"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=6&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV4"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=6&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV6"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
 		<?php else: ?>
 		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;dname=<?php echo rawurlencode($link['descr'] . ""); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
 		<?php endif; ?>
