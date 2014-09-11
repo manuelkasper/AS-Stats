@@ -21,3 +21,23 @@ $asset_graph_height = 200;
 /* Defaults for other settings, introduced in recent versions */
 $vertical_label = true;			# vertical IN/OUT label in graph
 $brighten_negative = true;		# brighten the "negative" part of graphs
+$showpeeras = false;
+
+/* Time intervals for top N AS */
+$top_intervals = array(
+	array(
+		'hours' => 24,
+		'label' => '24 hours',
+		'statslabel' => '24 hours'
+	),
+	array(
+		'hours' => 4,
+		'label' => '4 hours',
+		'statslabel' => '24 hours'
+	),
+	array(
+		'hours' => 12,
+		'label' => '12 hours',
+		'statslabel' => '24 hours'
+	)
+);

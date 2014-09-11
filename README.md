@@ -30,8 +30,9 @@ scripts.
 Prerequisites
 -------------
 
-- Perl 5.10
-- RRDtool 1.2 (with Perl "RRDs" library)
+- Perl 5.10 or newer
+- RRDtool 1.3 or newer (with Perl "RRDs" library)
+- File::Find::Rule module (CPAN)
 - if using sFlow: the Net::sFlow module (CPAN)
 - web server with PHP 5
 - one or more routers than can generate NetFlow v8/v9 AS aggregation records
@@ -260,13 +261,29 @@ Installation
 
 - Add a cronjob to run the following command every hour:
 
-	`rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks \
-		/path/to/asstats_day.txt`
+	`rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks /path/to/asstats_day.txt`
 
   That script will go through all RRD files and collect per-link summary
   stats for each AS, sort them by total traffic (descending), and write them
   to a text file. The "top N AS" page uses this to determine which ASes to
   show.
+  
+  If you want an additional interval for the top N AS (e.g. top N AS in the
+  last 30 days), add another cronjob with the desired interval in hours as
+  the last argument (and another output file of course). Example:
+  
+	`rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks /path/to/asstats_month.txt 720`
+
+  Add the interval to the top_intervals array in config.inc (see the example) so that
+  it will appear in the web interface.
+
+  Repeat for further intervals if necessary.
+  
+  It is not recommended to run more than one rrd-extractstats.pl cronjobs at the same
+  time for disk I/O reasons – add some variation in the start minute setting
+  so that the jobs can run separately.
+  For longer intervals than one day, the cronjob frequency can be adjusted as
+  well (e.g. for monthly output, it is sufficient to run the cronjob once a day).
   
 - Copy the contents of the "www" directory to somewhere within your web
   server's document root and change file paths in config.inc as necessary.

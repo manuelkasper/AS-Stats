@@ -110,6 +110,11 @@ div#legend {
 	float: right;
 }
 
+#nav span {
+	font-weight: bold;
+	font-size: 1.15em;
+}
+
 #nav a, #nav a:visited {
 	text-decoration: none;
 	font-weight: bold;

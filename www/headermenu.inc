@@ -1,34 +1,21 @@
 <?php 
 $dpagename = basename($_SERVER['PHP_SELF'], ".php");
 
-if ($dpagename == "top" && !@$_GET['numhours']): 
-	?><a href="top.php" class="selected">Top AS</a> | <?php
-else:
-	?><a href="top.php">Top AS</a> | <?php 
-endif;
+echo "<span>Top AS:</span> ";
+foreach ($top_intervals as $interval) {
+	echo '<a href="top.php?numhours=' . $interval['hours'] . '"';
+	if ($dpagename == "top" && @$_GET['numhours'] == $interval['hours'])
+		echo ' class="selected"';
+	echo '>' . $interval['label'] . '</a> | ';
+}
 
 if($showpeeras == true){
 	if ($dpagename == "peerusage"):
-		?><a href="peerusage.php" class="selected">Top Peer AS</a> | <?php
+		?><a href="peerusage.php" class="selected">Peer 24 hours</a> | <?php
 	else:
-		?><a href="peerusage.php">Top AS Peer<a> | <?php
+		?><a href="peerusage.php">Peer 24 hours<a> | <?php
 	endif;
 }
-
-
-if ($dpagename == "top" && @$_GET['numhours'] == 4): 
-	?><a href="top.php?numhours=4" class="selected">4 Hour</a> | <?php
-else:
-	?><a href="top.php?numhours=4">4 Hour</a> | <?php 
-endif;
-
-
-if ($dpagename == "top" && @$_GET['numhours'] == 12): 
-	?><a href="top.php?numhours=12" class="selected">12 Hour</a> | <?php
-else:
-	?><a href="top.php?numhours=12">12 Hour</a> | <?php 
-endif;
-
 
 if ($dpagename == "history"): 
 	?><a href="history.php" class="selected">View an AS</a> | <?php

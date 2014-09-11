@@ -15,15 +15,39 @@ if (isset($_GET['n']))
 if ($ntop > 200)
 	$ntop = 200;
 
-$topas = getasstats_top($ntop, $peerusage);
+if ($peerusage)
+	$statsfile = $daypeerstatsfile;
+else {
+	$statsfile = $daystatsfile;
+	
+	/* find more appropriate file for this interval */
+	foreach ($top_intervals as $interval) {
+		if ($interval['hours'] == @$_GET['numhours']) {
+			if (@$interval['statsfile'])
+				$statsfile = $interval['statsfile'];
+			if (@$interval['label'])
+				$label = $interval['label'];
+			if (@$interval['statslabel'])
+				$statslabel = $interval['statslabel'];
+		}
+	}
+}
+$topas = getasstats_top($ntop, $statsfile);
 
 if (@$_GET['numhours']) {
 	$start = time() - $_GET['numhours']*3600;
 	$end = time();
+	if (!$label)
+		$label = htmlspecialchars($_GET['numhours']) . " hours";
 } else {
 	$start = "";
 	$end = "";
+	if (!$label)
+		$label = "24 hours";
 }
+
+if (!$statslabel)
+	$statslabel = $label;
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -32,7 +56,7 @@ if (@$_GET['numhours']) {
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Refresh" content="300" />
-	<title>Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></title>
+	<title>Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?> (<?=$label?>)</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
@@ -46,7 +70,7 @@ Number of AS:
 <?php include('headermenu.inc'); ?>
 </form>
 </div>
-<div class="pgtitle">Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?></div>
+<div class="pgtitle">Top <?php echo $ntop; ?> AS<?php if($peerusage) echo " peer"; ?> (<?=$label?>)</div>
 
 <table class="astable">
 
@@ -67,10 +91,10 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 			AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 		</div>
 		<div class="small">IPv4: ~ <?php echo format_bytes($nbytes[0]); ?> in / 
-			<?php echo format_bytes($nbytes[1]); ?> out in the last 24 hours</div>
+			<?php echo format_bytes($nbytes[1]); ?> out in the last <?=$statslabel?></div>
 		<?php if ($showv6): ?>
 		<div class="small">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
-			<?php echo format_bytes($nbytes[3]); ?> out in the last 24 hours</div>
+			<?php echo format_bytes($nbytes[3]); ?> out in the last <?=$statslabel?></div>
 		<?php endif; ?>
 
 <?php if (!empty($customlinks)): ?>

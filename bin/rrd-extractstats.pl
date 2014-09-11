@@ -10,13 +10,18 @@ use RRDs;
 use File::Find;
 use File::Find::Rule;
 
-if ($#ARGV != 2) {
-	die("Usage: $0 <path to RRD file directory> <path to known links file> outfile\n");
+if ($#ARGV < 2) {
+	die("Usage: $0 <path to RRD file directory> <path to known links file> outfile [interval-hours]\n");
 }
 
 my $rrdpath = $ARGV[0];
 my $knownlinksfile = $ARGV[1];
 my $statsfile = $ARGV[2];
+my $interval = 86400;
+
+if ($ARGV[3]) {
+    $interval = $ARGV[3] * 3600;
+}
 
 my %knownlinks;
 
@@ -37,7 +42,7 @@ foreach my $rrdfile (@rrdfiles) {
 	if ($rrdfile =~ /\/(\d+).rrd$/) {
 		my $as = $1;
 		
-		$astraffic->{$as} = gettraffic($as, time - 86400, time);
+		$astraffic->{$as} = gettraffic($as, time - $interval, time);
 		$i++;
 		if ($i % 100 == 0) {
 			print "$i... ";

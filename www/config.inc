@@ -37,5 +37,21 @@ $customlinks = array(
 	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%'
 );
 
+/* Custom time intervals for top N AS */
+/*
+$top_intervals[] = array(
+	'hours' => 7*24,
+	'statsfile' => '/data/as-stats/asstats_week.txt',
+	'label' => '1 week',
+	//'statslabel' => '1 week'		// overrides display of "... in the last ..." - use if 'hours' parameter does not correspond with statsfile interval
+);
+$top_intervals[] = array(
+	'hours' => 30*24,
+	'statsfile' => '/data/as-stats/asstats_month.txt',
+	'label' => '30 days',
+	//'statslabel' => '30 days'		// overrides display of "... in the last ..." - use if 'hours' parameter does not correspond with statsfile interval
+);
+*/
+
 
 /* END - no closing php tag needed here (prevents problems with stray whitespace) */

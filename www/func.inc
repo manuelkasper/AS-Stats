@@ -95,15 +95,7 @@ function getknownlinks() {
 	return $knownlinks;
 }
 
-function getasstats_top($ntop, $peer = 0) {
-	if($peer == 0){
-		global $daystatsfile;
-		$statfile = $daystatsfile;
-	}else{
-		global $daypeerstatsfile;
-		$statfile = $daypeerstatsfile;
-	}
-	
+function getasstats_top($ntop, $statfile) {	
 	/* first step: walk the data for all ASes to determine the top 5 for the given link */
 	$fd = fopen($statfile, "r");
 	if (!$fd)
@@ -148,7 +140,9 @@ function getasstats_top($ntop, $peer = 0) {
 }
 
 function format_bytes($bytes) {
-	if ($bytes >= 1073741824)
+	if ($bytes >= 1099511627776)
+		return sprintf("%.2f TB", $bytes / 1099511627776);
+	else if ($bytes >= 1073741824)
 		return sprintf("%.2f GB", $bytes / 1073741824);
 	else if ($bytes >= 1048576)
 		return sprintf("%.2f MB", $bytes / 1048576);

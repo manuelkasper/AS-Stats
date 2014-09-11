@@ -6,6 +6,8 @@
   your knownlinks file.
 * Added support for peer-AS stats/graphs (sFlow only).
 	* Add -n option to asstats.pl and set showpeeras=true in config.inc to enable.
+* Top N AS intervals are now configurable (see config.inc and README), and separate top stats files can be used per interval (enables e.g. proper weekly/monthly stats).
+* Added Terabyte formatting.
 
 ## 1.5
 
