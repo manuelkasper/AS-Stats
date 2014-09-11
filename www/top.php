@@ -27,8 +27,6 @@ else {
 				$statsfile = $interval['statsfile'];
 			if (@$interval['label'])
 				$label = $interval['label'];
-			if (@$interval['statslabel'])
-				$statslabel = $interval['statslabel'];
 		}
 	}
 }
@@ -45,9 +43,6 @@ if (@$_GET['numhours']) {
 	if (!$label)
 		$label = "24 hours";
 }
-
-if (!$statslabel)
-	$statslabel = $label;
 
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
@@ -91,10 +86,10 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 			AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 		</div>
 		<div class="small">IPv4: ~ <?php echo format_bytes($nbytes[0]); ?> in / 
-			<?php echo format_bytes($nbytes[1]); ?> out in the last <?=$statslabel?></div>
+			<?php echo format_bytes($nbytes[1]); ?> out in the last <?=$label?></div>
 		<?php if ($showv6): ?>
 		<div class="small">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
-			<?php echo format_bytes($nbytes[3]); ?> out in the last <?=$statslabel?></div>
+			<?php echo format_bytes($nbytes[3]); ?> out in the last <?=$label?></div>
 		<?php endif; ?>
 
 <?php if (!empty($customlinks)): ?>

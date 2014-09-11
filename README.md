@@ -264,7 +264,7 @@ Installation
 	`rrd-extractstats.pl /path/to/rrd/dir /path/to/knownlinks /path/to/asstats_day.txt`
 
   That script will go through all RRD files and collect per-link summary
-  stats for each AS, sort them by total traffic (descending), and write them
+  stats for each AS in the last 24 hours, sort them by total traffic (descending), and write them
   to a text file. The "top N AS" page uses this to determine which ASes to
   show.
   

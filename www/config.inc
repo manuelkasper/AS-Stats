@@ -42,14 +42,12 @@ $customlinks = array(
 $top_intervals[] = array(
 	'hours' => 7*24,
 	'statsfile' => '/data/as-stats/asstats_week.txt',
-	'label' => '1 week',
-	//'statslabel' => '1 week'		// overrides display of "... in the last ..." - use if 'hours' parameter does not correspond with statsfile interval
+	'label' => '1 week'
 );
 $top_intervals[] = array(
 	'hours' => 30*24,
 	'statsfile' => '/data/as-stats/asstats_month.txt',
-	'label' => '30 days',
-	//'statslabel' => '30 days'		// overrides display of "... in the last ..." - use if 'hours' parameter does not correspond with statsfile interval
+	'label' => '30 days'
 );
 */
 

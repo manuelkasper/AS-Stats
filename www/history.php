@@ -54,13 +54,6 @@ $rrdfile = getRRDFileForAS($as, $peerusage);
 <?php if (!file_exists($rrdfile)): ?>
 <p>No data found for AS <?php echo $as; ?></p>
 <?php else: ?>
-<div class="title">4 Hourly</div>
-<?php
-echo getHTMLImg($as, 4, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph', true);
-if ($showv6)
-	echo getHTMLImg($as, 6, $asinfo['descr'], time() - 4 * 3600, time(), $peerusage, 'hourly graph', 'detailgraph2', true);
-?>
-
 <div class="title">Daily</div>
 <?php
 echo getHTMLImg($as, 4, $asinfo['descr'], time() - 24 * 3600, time(), $peerusage, 'daily graph', 'detailgraph', true);
