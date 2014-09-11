@@ -7,7 +7,7 @@ $daystatsfile = "/data/as-stats/asstats_day.txt";
 $rrdtool = "/usr/bin/rrdtool";
 
 $daypeerstatsfile = "/data/as-stats/peerasstats_day.txt";
-$showpeeras = true;
+$showpeeras = false;
 
 $asinfofile = "asinfo.txt";
 $knownlinksfile = "/data/as-stats/conf/knownlinks";

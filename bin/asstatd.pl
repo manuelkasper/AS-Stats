@@ -47,7 +47,7 @@ my $usage = "$0 [-rpPka]\n".
 	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
 	"\t-k <path to known links file>\n".
 	"\t-a <your own AS number> - only required for sFlow\n".
-	"\t-n - enable peer-as statistics\n";
+	"\t-n enable peer-as statistics\n";
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
@@ -74,6 +74,10 @@ if ($sflow_server_port == $server_port) {
 }
 
 die("Your own AS number is non numeric\n") if ($sflow_server_port > 0 && $myas !~ /^[0-9]+$/);
+
+if (!$sflow_server_port && $peerasstats) {
+    die("peer-as statistics only work with sFlow\n");
+}
 
 
 # reap dead children
@@ -566,34 +570,36 @@ sub parse_sflow {
 			$vlanout = $sFlowSample->{'SwitchDestVlan'};
 		}
 
-		# srcpeeras is the one who sent me data
-		# dstpeeras is the first one to which you'll send the data
-		# so, dstpeeras is the first entry in array
-		# if the array is now empty (poped before), then take $dstas
-		my $srcpeeras = ($sFlowSample->{'GatewayAsSourcePeer'}) ? $sFlowSample->{'GatewayAsSourcePeer'} : 0;
-		my $dstpeeras = 0;
-
-		if ($sFlowSample->{'GatewayDestAsPaths'}) {
-			$dstpeeras = @{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}}[0];
-			if (!$dstpeeras) {
-				$dstpeeras = 0;
-			}
-		}
-		if($dstpeeras == 0 && $dstas != 0){
-			$dstpeeras = $dstas;
-		}
-
-		if ($srcpeeras == $myas) {
-			$srcpeeras = 0;
-		}
-		if ($dstpeeras== $myas) {
-			$dstpeeras = 0;
-		}
-
 		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout);
 
-		if($peerasstats && ($srcpeeras != 0 || $dstpeeras != 0)){
-			handleflow($ipaddr, $noctets, $srcpeeras, $dstpeeras, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout, 1);
+		if ($peerasstats) {
+    		# srcpeeras is the one who sent me data
+    		# dstpeeras is the first one to which you'll send the data
+    		# so, dstpeeras is the first entry in array
+    		# if the array is now empty (poped before), then take $dstas
+    		my $srcpeeras = ($sFlowSample->{'GatewayAsSourcePeer'}) ? $sFlowSample->{'GatewayAsSourcePeer'} : 0;
+    		my $dstpeeras = 0;
+
+    		if ($sFlowSample->{'GatewayDestAsPaths'}) {
+    			$dstpeeras = @{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}}[0];
+    			if (!$dstpeeras) {
+    				$dstpeeras = 0;
+    			}
+    		}
+    		if($dstpeeras == 0 && $dstas != 0){
+    			$dstpeeras = $dstas;
+    		}
+
+    		if ($srcpeeras == $myas) {
+    			$srcpeeras = 0;
+    		}
+    		if ($dstpeeras == $myas) {
+    			$dstpeeras = 0;
+    		}
+		    
+		    if ($srcpeeras != 0 || $dstpeeras != 0) {
+			    handleflow($ipaddr, $noctets, $srcpeeras, $dstpeeras, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout, 1);
+			}
 		}
 	}
 }

@@ -4,6 +4,8 @@
   sFlow, Netflow v9 and v10 (IPFIX) support this. Obviously your router
   needs to provide the information. Just add "/<vlan>" to the ifIndex in
   your knownlinks file.
+* Added support for peer-AS stats/graphs (sFlow only).
+	* Add -n option to asstats.pl and set showpeeras=true in config.inc to enable.
 
 ## 1.5
 
