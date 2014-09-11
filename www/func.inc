@@ -245,3 +245,23 @@ function getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, $alt, $cla
 	$result .= "/>";
 	return($result);
 }
+
+function statsFileForHours($hours) {
+	global $top_intervals, $daystatsfile;
+	foreach ($top_intervals as $interval) {
+		if ($interval['hours'] == $hours && @$interval['statsfile']) {
+			return $interval['statsfile'];
+		}
+	}
+	return $daystatsfile;
+}
+
+function statsLabelForHours($hours) {
+	global $top_intervals;
+	foreach ($top_intervals as $interval) {
+		if ($interval['hours'] == $hours && @$interval['label']) {
+			return $interval['label'];
+		}
+	}
+	return (int)$hours . " hours";
+}

@@ -9,6 +9,12 @@ require_once('func.inc');
 
 $knownlinks = getknownlinks();
 
+$hours = 24;
+if (@$_GET['numhours'])
+	$hours = (int)$_GET['numhours'];
+
+$label = statsLabelForHours($hours);
+
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -16,14 +22,14 @@ $knownlinks = getknownlinks();
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Refresh" content="300" />
-	<title>Link usage</title>
+	<title>Link usage (<?php echo $label ?>)</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 
 <body>
 
 <div id="nav"><?php include('headermenu.inc'); ?></div>
-<div class="pgtitle">Link usage - top 10 AS per link</div>
+<div class="pgtitle">Link usage - top 10 AS per link  (<?php echo $label ?>)</div>
 
 <table class="astable">
 
@@ -40,10 +46,10 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 	<?php endif; ?>
 	<td>
 		<?php if ($showv6): ?>
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=4&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV4"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=6&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV6"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;numhours=<?php echo $hours ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=4&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV4"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;numhours=<?php echo $hours ?>width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;v=6&amp;dname=<?php echo rawurlencode($link['descr'] . " - IPV6"); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
 		<?php else: ?>
-		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;dname=<?php echo rawurlencode($link['descr'] . ""); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
+		<img alt="link graph" src="linkgraph.php?link=<?php echo $link['tag']; ?>&amp;numhours=<?php echo $hours ?>width=<?php echo $linkusage_graph_width ?>&amp;height=<?php echo $linkusage_graph_height ?>&amp;dname=<?php echo rawurlencode($link['descr'] . ""); ?>" width="<?php echo $linkusage_graph_width ?>" height="<?php echo $linkusage_graph_height ?>" border="0" />
 		<?php endif; ?>
 	</td>
 </tr>

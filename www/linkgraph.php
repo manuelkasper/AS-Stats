@@ -17,8 +17,13 @@ if (!preg_match("/^[0-9a-zA-Z][0-9a-zA-Z\-_]+$/", $link))
 if (@$_GET['v'] == 6)
 	$link .= "_v6";
 
+$hours = 24;
+if (@$_GET['numhours'])
+	$hours = (int)$_GET['numhours'];
+
 /* first step: walk the data for all ASes to determine the top 5 for the given link */
-$fd = fopen($daystatsfile, "r");
+$statsfile = statsFileForHours($hours);
+$fd = fopen($statsfile, "r");
 $cols = explode("\t", trim(fgets($fd)));
 $asstats = array();
 
@@ -73,9 +78,13 @@ if ($compat_rrdtool12) {
 	$width -= 81;
 }
 
+$start = time() - $hours*3600;
+$end = time();
+
 $cmd = "$rrdtool graph - " .
 	"--slope-mode --alt-autoscale -u 0 -l 0 --imgformat=PNG --base=1000 --height=$height --width=$width " .
-	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 ";
+	"--color BACK#ffffff00 --color SHADEA#ffffff00 --color SHADEB#ffffff00 " . 
+	"--start " . $start . " --end " . $end . " ";
 
 if (!$compat_rrdtool12)
 	$cmd .= "--full-size-mode ";
