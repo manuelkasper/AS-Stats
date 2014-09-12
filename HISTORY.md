@@ -1,4 +1,4 @@
-## post 1.5
+## 1.6
 
 * Added support for multiple links on one ifIndex, based on VLANs. Only
   sFlow, Netflow v9 and v10 (IPFIX) support this. Obviously your router

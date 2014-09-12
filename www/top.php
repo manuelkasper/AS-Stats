@@ -47,6 +47,7 @@ $end = time();
 <form action="" method="get">
 Number of AS: 
 <input type="text" name="n" size="4" value="<?php echo $ntop; ?>" />
+<input type="hidden" name="numhours" value="<?php echo $hours; ?>" />
 <input type="submit" value="Go" style="margin-right: 2em" />
 <?php include('headermenu.inc'); ?>
 </form>
