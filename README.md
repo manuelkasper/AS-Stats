@@ -362,6 +362,11 @@ Support
 A mailing list is available at https://groups.google.com/d/forum/as-stats-users. Please do not send requests for help/support directly to the author.
 
 
+Donations
+---------
+- Immobilien Scout GmbH sponsored the work to add support for multiple configurable stats intervals
+
+
 To do
 -----
 
