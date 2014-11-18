@@ -53,7 +53,7 @@ if ($vertical_label) {
 		$cmd .= "--vertical-label '<- OUT | IN ->' ";
 }
 
-if($showtitledetail && $_GET['dname'] != "")
+if($showtitledetail && @$_GET['dname'] != "")
 	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
 else
 	if (isset($_GET['v']) && is_numeric($_GET['v']))

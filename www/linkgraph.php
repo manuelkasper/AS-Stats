@@ -65,9 +65,9 @@ header("Content-Type: image/png");
 
 $width = $default_graph_width;
 $height = $default_graph_height;
-if ($_GET['width'])
+if (@$_GET['width'])
 	$width = (int)$_GET['width'];
-if ($_GET['height'])
+if (@$_GET['height'])
 	$height = (int)$_GET['height'];
 
 $knownlinks = getknownlinks();
@@ -89,7 +89,7 @@ $cmd = "$rrdtool graph - " .
 if (!$compat_rrdtool12)
 	$cmd .= "--full-size-mode ";
 
-if($showtitledetail && $_GET['dname'] != "")
+if($showtitledetail && @$_GET['dname'] != "")
 	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
 else
 	if (isset($_GET['v']) && is_numeric($_GET['v']))
