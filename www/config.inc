@@ -34,7 +34,8 @@ $customlinks = array(
 	'robtex' => 'http://www.robtex.com/as/as%as%.html',
 	'HE' => 'http://bgp.he.net/AS%as%',
 	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance',
-	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%'
+	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%',
+	'Radar Qrator' => 'https://radar.qrator.net/general/?asnum=%as%'
 );
 
 /* Custom time intervals for top N AS */
