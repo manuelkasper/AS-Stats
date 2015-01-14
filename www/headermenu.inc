@@ -13,7 +13,7 @@ if($showpeeras == true){
 	if ($dpagename == "peerusage"):
 		?><a href="peerusage.php" class="selected">Peer 24 hours</a> | <?php
 	else:
-		?><a href="peerusage.php">Peer 24 hours<a> | <?php
+		?><a href="peerusage.php">Peer 24 hours</a> | <?php
 	endif;
 }
 
