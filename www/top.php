@@ -23,8 +23,8 @@ if ($peerusage)
 	$statsfile = $daypeerstatsfile;
 else {
 	$statsfile = statsFileForHours($hours);
-	$label = statsLabelForHours($hours);
 }
+$label = statsLabelForHours($hours);
 $topas = getasstats_top($ntop, $statsfile);
 
 $start = time() - $hours*3600;
