@@ -19,7 +19,7 @@ function getASInfo($asnum) {
 	if (!isset($asinfodb))
 		$asinfodb = readasinfodb();
 	
-	if ($asinfodb[$asnum])
+	if (@$asinfodb[$asnum])
 		return $asinfodb[$asnum];
 	else
 		return array('name' => "AS$asnum", 'descr' => "AS $asnum");
