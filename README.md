@@ -183,7 +183,7 @@ Installation
 		chassis {
 			tfeb {
 				slot 0 {
-					sampling-instance flow-ipfix;
+					sampling-instance as-stats;
 				}
 			}
 		}
@@ -202,9 +202,9 @@ Installation
 		forwarding-options {
 			sampling {
 				instance {
-					flow-ipfix {
+					as-stats {
 						input {
-							rate 1;
+							rate 2048;
 						}
 						family inet {
 							output {
@@ -212,6 +212,7 @@ Installation
 									port 9000;
 									autonomous-system-type origin;
 									no-local-dump;
+									source-address 192.0.2.1;
 									version-ipfix {
 										template {
 											ipv4;
