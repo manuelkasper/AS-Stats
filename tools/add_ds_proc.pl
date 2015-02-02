@@ -56,12 +56,12 @@ while (<STDIN>) {
 
     ($num_sources) = ($datasource =~ /(\d+)/);
     
-    for ($x = $num_sources+1; $x < $num_sources+$ds+1; $x++) {
+    for ($x = 0; $x < $ds; $x++) {
 
       $fields .= $field;
       
       print "\n\t<ds>\n";
-      print "\t\t<name> " . $dsnames[$x-1] . " <\/name>\n";
+      print "\t\t<name> " . $dsnames[$x] . " <\/name>\n";
       print "\t\t<type> $type <\/type>\n";
       print "\t\t<minimal_heartbeat> $heartbeat <\/minimal_heartbeat>\n";
       print "\t\t<min> $rrdmin <\/min>\n";
