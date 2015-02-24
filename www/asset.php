@@ -38,20 +38,7 @@ if ( $action == "clearall" ) {
 <div id="nav"><?php include('headermenu.inc'); ?></div>
 
 <?php if ($asset): ?>
-<div class="pgtitle">History for AS-SET: <?php echo $asset; ?>
-	<?php if (!empty($customlinks)): ?>
-	<div class="customlinks">
-	<?php 
-		$htmllinks = array();
-		foreach ($customlinks as $linkname => $url) {
-			$url = str_replace("%as%", $as, $url);
-			$htmllinks[] = "<a href=\"$url\" target=\"_blank\">" . htmlspecialchars($linkname) . "</a>\n";
-		}
-		echo join(" | ", $htmllinks);
-		?>
-	</div>
-	<?php endif; ?>
-</div>
+<div class="pgtitle">History for AS-SET: <?php echo $asset; ?></div>
 <?php else: ?>
 <div class="pgtitle">View history for an AS-SET</div>
 <?php endif; ?>
@@ -110,6 +97,19 @@ if ( $action == "clearall" ) {
 			<?php endif; ?>
 			AS<?php echo $as; ?>: <?php echo $asinfo['descr']; ?>
 		</div>
+
+<?php if (!empty($customlinks)): ?>
+		<div class="customlinks">
+<?php
+$htmllinks = array();
+foreach ($customlinks as $linkname => $url) {
+	$url = str_replace("%as%", $as, $url);
+	$htmllinks[] = "<a href=\"$url\" target=\"_blank\">" . htmlspecialchars($linkname) . "</a>\n";
+}
+echo join(" | ", $htmllinks);
+?>
+		</div>
+<?php endif; ?>
 
 		<div class="rank">
 			#<?php echo ($i+1); ?>
