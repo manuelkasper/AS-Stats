@@ -193,7 +193,7 @@ sub read_knownlinks {
 		my ($routerip,$ifindex,$tag,$descr,$color) = split(/\t+/);
 		my $known = 0;
 		foreach my $link (values %knownlinks) {
-			if ($tag =~ $link) { $known=1; last; }
+			if ($tag eq $link) { $known=1; last; }
 		}
 		if ($known == 0) {
 			$knownlinks{"${routerip}_${ifindex}"} = $tag;
