@@ -36,7 +36,7 @@ $customlinks = array(
 	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance',
 	'CIDR v4' => 'http://www.cidr-report.org/cgi-bin/as-report?as=AS%as%&view=2.0',
 	'CIDR v6' => 'http://www.cidr-report.org/cgi-bin/as-report?as=AS%as%&view=2.0&v=6',
-	'Radar Qrator' => 'https://radar.qrator.net/general/?asnum=%as%'
+	'Radar Qrator' => 'https://radar.qrator.net/as%as%/'
 );
 
 /* Custom time intervals for top N AS */
