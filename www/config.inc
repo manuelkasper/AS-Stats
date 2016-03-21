@@ -30,12 +30,13 @@ $compat_rrdtool12 = false;		# compatibility with RRDtool 1.2 (show95th will not 
 /* Custom links to be shown for each AS. You can use %as% as a
    placeholder for the ASN. */
 $customlinks = array(
-	'PeeringDB' => 'http://www.peeringdb.com/view.php?asn=%as%',
-	'robtex' => 'http://www.robtex.com/as/as%as%.html',
+	'PeeringDB' => 'https://www.peeringdb.com/asn/%as%',
+	'robtex' => 'https://www.robtex.com/as/as%as%.html',
 	'HE' => 'http://bgp.he.net/AS%as%',
 	'RIPEstat' => 'https://stat.ripe.net/AS%as%#tabId=at-a-glance',
-	'euro-IX' => 'https://www.euro-ix.net/tools/asn_search?query=%as%',
-	'Radar Qrator' => 'https://radar.qrator.net/general/?asnum=%as%'
+	'CIDR v4' => 'http://www.cidr-report.org/cgi-bin/as-report?as=AS%as%&view=2.0',
+	'CIDR v6' => 'http://www.cidr-report.org/cgi-bin/as-report?as=AS%as%&view=2.0&v=6',
+	'Radar Qrator' => 'https://radar.qrator.net/as%as%/'
 );
 
 /* Custom time intervals for top N AS */
