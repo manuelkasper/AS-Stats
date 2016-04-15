@@ -714,6 +714,9 @@ sub flush_cache {
 				
 				my $tag = $dsname;
 				$tag =~ s/(_v6)?_(in|out)$//;
+				if ($dsname =~ /_(in|out)$/) {
+					$tag = "${1}_${tag}";
+				}
 				my $cursamplingrate = $link_samplingrates{$tag};
 				
 				push(@templatearg, $dsname);
@@ -794,12 +797,19 @@ sub read_knownlinks {
 		
 		my ($routerip,$ifindex,$tag,$descr,$color,$linksamplingrate) = split(/\t+/);
 		$knownlinks_tmp{"${routerip}_${ifindex}"} = $tag;
-		
-		unless(defined($linksamplingrate) && $linksamplingrate =~ /^\d+$/) {
+
+		my ($samplein,$sampleout) = split('/', $linksamplingrate);
+		unless(defined($sampleout) && $sampleout =~ /^\d+$/) {
+			$sampleout = $samplein;
+		}
+
+		unless(defined($samplein) && $samplein =~ /^\d+$/) {
 			die("ERROR: No samplingrate for ".$routerip."\n");
 		}
 		
-		$link_samplingrates_tmp{$tag} = $linksamplingrate;
+		$link_samplingrates_tmp{"in_$tag"} = $samplein;
+		$link_samplingrates_tmp{"out_$tag"} = $sampleout;
+		#print "DEBUG Sampling Rate for ${routerip}_${ifindex} is IN: $samplein | OUT: $sampleout\n";
 	}
 	close(KLFILE);
 	
