@@ -119,13 +119,15 @@ function getasstats_top($ntop, $statfile) {
 		
 		for ($i = 1; $i < count($els); $i++) {
 			if (strpos($cols[$i], "_in") !== false) {
-				$tot_in += $els[$i];
 				if (strpos($cols[$i], "_v6_") !== false)
 					$tot_v6_in += $els[$i];
+				else
+					$tot_in += $els[$i];
 			} else {
-				$tot_out += $els[$i];
 				if (strpos($cols[$i], "_v6_") !== false)
 					$tot_v6_out += $els[$i];
+				else
+					$tot_out += $els[$i];
 			}
 		}
 		
