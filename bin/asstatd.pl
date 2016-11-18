@@ -517,9 +517,6 @@ sub parse_sflow {
 			next;
 		}
 		
-		my $snmpin = $sFlowSample->{'inputInterface'};
-		my $snmpout = $sFlowSample->{'outputInterface'};
-		
 		if ($snmpin >= 1073741823 || $snmpout >= 1073741823) {
 			# invalid interface index - could be dropped packet or internal
 			# (routing protocol, management etc.)
