@@ -503,11 +503,19 @@ sub parse_sflow {
 		# only process standard structures
 		next if ($sFlowSample->{'sampleTypeEnterprise'} != 0);
 		
-		# only process normal flow samples
-		next if ($sFlowSample->{'sampleTypeFormat'} != 1);
-		
-		my $snmpin = $sFlowSample->{'inputInterface'};
-		my $snmpout = $sFlowSample->{'outputInterface'};
+		my $snmpin;
+		my $snmpout;
+		if ($sFlowSample->{'sampleTypeFormat'} == 1) {
+			$snmpin = $sFlowSample->{'inputInterface'};
+			$snmpout = $sFlowSample->{'outputInterface'};
+		} elsif ($sFlowSample->{'sampleTypeFormat'} == 3) {
+			next if $sFlowSample->{'inputInterfaceFormat'} != 0;
+			next if $sFlowSample->{'outputInterfaceFormat'} != 0;
+			$snmpin = $sFlowSample->{inputInterfaceValue};
+			$snmpout = $sFlowSample->{outputInterfaceValue};
+		} else {
+			next;
+		}
 		
 		if ($snmpin >= 1073741823 || $snmpout >= 1073741823) {
 			# invalid interface index - could be dropped packet or internal
