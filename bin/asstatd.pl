@@ -51,7 +51,7 @@ my $usage = "$0 [-rpPka]\n".
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
-my $myas = $opt{'a'};
+my $myas_opt = $opt{'a'};
 my $peerasstats = $opt{'n'};
 
 die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile));
@@ -73,7 +73,15 @@ if ($sflow_server_port == $server_port) {
 	die("sFlow server port can't be the same as NetFlow server port\n");
 }
 
-die("Your own AS number is non numeric\n") if ($sflow_server_port > 0 && $myas !~ /^[0-9]+$/);
+my %myas;
+if($sflow_server_port > 0){
+	die('No ASN found, please specify -a') if !defined($myas_opt);
+	%myas = split(',', $myas_opt);
+	for my $i (%myas){
+		next if !defined($i);
+		die("Your AS number is non numeric ($i)\n") if ($i !~ /^[0-9]+$/);
+	}
+}
 
 if (!$sflow_server_port && $peerasstats) {
     die("peer-as statistics only work with sFlow\n");
@@ -562,10 +570,10 @@ sub parse_sflow {
 		# them twice; once for input and once for output)
 		
 		# substitute 0 for own AS number
-		if ($srcas == $myas) {
+		if ($myas{$srcas}) {
 			$srcas = 0;
 		}
-		if ($dstas == $myas) {
+		if ($myas{$dstas}) {
 			$dstas = 0;
 		}
 
@@ -598,10 +606,10 @@ sub parse_sflow {
     			$dstpeeras = $dstas;
     		}
 
-    		if ($srcpeeras == $myas) {
+		if ($myas{$srcpeeras}) {
     			$srcpeeras = 0;
     		}
-    		if ($dstpeeras == $myas) {
+		if ($myas{$dstpeeras}) {
     			$dstpeeras = 0;
     		}
 		    
