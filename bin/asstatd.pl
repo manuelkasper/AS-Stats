@@ -76,7 +76,7 @@ if ($sflow_server_port == $server_port) {
 my %myas;
 if($sflow_server_port > 0){
 	die('No ASN found, please specify -a') if !defined($myas_opt);
-	%myas = split(',', $myas_opt);
+	%myas = map {$_ => 1 } split(',', $myas_opt);
 	for my $i (%myas){
 		next if !defined($i);
 		die("Your AS number is non numeric ($i)\n") if ($i !~ /^[0-9]+$/);
