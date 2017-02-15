@@ -9,6 +9,11 @@ for line in sys.stdin:
 	except ValueError:
 		continue
 
+	try:
+		data,country = data.rsplit(',',1)
+	except:
+		data = data
+
 	if data == '-Private Use AS-':
 		data = 'Private Use AS'
 
