@@ -17,7 +17,6 @@ $show95th = true;
 $ntop = 20;
 $showv6 = true;
 $showtitledetail = true;
-$hidelinkusagename = true;	  	# $showtitledetail will need to be true to allow this
 $vertical_label = true;			# vertical IN/OUT label in graph
 $brighten_negative = true;		# brighten the "negative" part of graphs
 

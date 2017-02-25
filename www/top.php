@@ -25,7 +25,15 @@ else {
 	$statsfile = statsFileForHours($hours);
 }
 $label = statsLabelForHours($hours);
-$topas = getasstats_top($ntop, $statsfile);
+
+$knownlinks = getknownlinks();
+$selected_links = array();
+foreach($knownlinks as $link){
+	if(isset($_GET["link_${link['tag']}"]))
+		$selected_links[] = $link['tag'];
+}
+
+$topas = getasstats_top($ntop, $statsfile, $selected_links);
 
 $start = time() - $hours*3600;
 $end = time();
@@ -98,9 +106,9 @@ echo join(" | ", $htmllinks);
 	</th>
 	<td>
 		<?php
-		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage);
+		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
 		if ($showv6)
-			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end, $peerusage);
+			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
 		?>
 	</td>
 </tr>
@@ -109,11 +117,20 @@ echo join(" | ", $htmllinks);
 </table>
 
 <div id="legend">
+<form method='get'>
+<input type='hidden' name='numhours' value='<?php echo $hours; ?>'/>
+<input type='hidden' name='n' value='<?php echo $ntop; ?>'/>
 <table>
 <?php
 $knownlinks = getknownlinks();
 foreach ($knownlinks as $link) {
-	echo "<tr><td style=\"border: 4px solid #fff;\">";
+	$tag = "link_${link['tag']}";
+
+	echo "<tr><td><input type='checkbox'";
+	if(isset($_GET[$tag]) && $_GET[$tag] == 'on')
+		echo " checked='checked'";
+
+	echo "name=\"$tag\" id=\"$tag\"/></td><td style=\"border: 4px solid #fff;\">";
 	
 	echo "<table style=\"border-collapse: collapse; margin: 0; padding: 0\"><tr>";
         if ($brighten_negative) {
@@ -124,10 +141,12 @@ foreach ($knownlinks as $link) {
 	}
 	echo "</tr></table>";
 	
-	echo "</td><td>&nbsp;" . $link['descr'] . "</td></tr>\n";
+	echo "</td><td><label for=\"$tag\">&nbsp;${link['descr']}</label></td></tr>\n";
 }
 ?>
 </table>
+<center><input type='submit' value='Filter'/></center>
+</form>
 </div>
 
 <?php include('footer.inc'); ?>

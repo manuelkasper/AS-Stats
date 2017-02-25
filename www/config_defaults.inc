@@ -10,10 +10,6 @@ $default_graph_height = 360;
 $top_graph_width = 600;
 $top_graph_height = 220;
 
-/* Size of graphs on link usage page */
-$linkusage_graph_width = 600;
-$linkusage_graph_height = 480;
-
 /* Size of graphs on AS-Set page */
 $asset_graph_width = 600;
 $asset_graph_height = 200;

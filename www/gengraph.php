@@ -29,6 +29,23 @@ else
 	$peerusage = 0;
 
 $knownlinks = getknownlinks();
+
+if(isset($_GET['selected_links'])){
+	$reverse = array();
+	foreach($knownlinks as $link)
+		$reverse[$link['tag']] = array('color' => $link['color'], 'descr' => $link['descr']);
+
+	$links = array();
+	foreach(explode(',', $_GET['selected_links']) as $tag){
+		$link = array('tag' => $tag,
+				'color' => $reverse[$tag]['color'],
+				'descr' => $reverse[$tag]['descr']);
+		$links[] = $link;
+	}
+
+	$knownlinks = $links;
+}
+
 $rrdfile = getRRDFileForAS($as, $peerusage);
 
 if ($compat_rrdtool12) {

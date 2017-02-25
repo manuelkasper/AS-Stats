@@ -17,14 +17,6 @@ if($showpeeras == true){
 	endif;
 }
 
-echo "<span>Link usage:</span> ";
-foreach ($top_intervals as $interval) {
-	echo '<a href="linkusage.php?numhours=' . $interval['hours'] . '"';
-	if ($dpagename == "linkusage" && @$_GET['numhours'] == $interval['hours'])
-		echo ' class="selected"';
-	echo '>' . $interval['label'] . '</a> | ';
-}
-
 if ($dpagename == "history"): 
 	?><a href="history.php" class="selected">View an AS</a> | <?php
 else:
