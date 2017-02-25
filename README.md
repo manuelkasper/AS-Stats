@@ -41,6 +41,8 @@ Prerequisites
 - File::Find::Rule module (CPAN)
 - if using sFlow: the Net::sFlow module (CPAN)
 - web server with PHP 5
+- php-sqlite3
+- libdbd-sqlite3-perl
 - one or more routers than can generate NetFlow v8/v9 AS aggregation records
   or sFlow samples
 
