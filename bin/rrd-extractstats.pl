@@ -30,7 +30,7 @@ read_knownlinks();
 my @links = values %knownlinks;
 
 # walk through all RRD files in the given path and extract stats for all links
-# from them; write the stats to a text file, sorted by total traffic
+# from them; write the stats to an sqlite database
 
 my @rrdfiles = File::Find::Rule->maxdepth(2)->file->in($rrdpath);
 
@@ -51,45 +51,34 @@ foreach my $rrdfile (@rrdfiles) {
 }
 print "\n";
 
-# now sort the keys in order of descending total traffic
-my @asorder = sort {
-	my $total_a = 0;
-	
-	foreach my $t (values %{$astraffic->{$a}}) {
-		$total_a += $t;
-	}
-	my $total_b = 0;
-	foreach my $t (values %{$astraffic->{$b}}) {
-		$total_b += $t;
-	}
-	return $total_b <=> $total_a;
-} keys %$astraffic;
-
-open(STATSFILE, ">$statsfile.tmp");
-
-# print header line
-print STATSFILE "as";
+my $query = 'create table stats(asn int';
 foreach my $link (@links) {
-	print STATSFILE "\t${link}_in\t${link}_out\t${link}_v6_in\t${link}_v6_out";
+	$query .= ", ${link}_in int, ${link}_out int, ${link}_v6_in int, ${link}_v6_out int";
 }
-print STATSFILE "\n";
+$query .= ');';
+
+use DBI;
+my $db = DBI->connect("dbi:SQLite:dbname=$statsfile.tmp", '', '');
+$db->do('PRAGMA synchronous = OFF');
+$db->do('drop table if exists stats');
+$db->do($query);
 
 # print data
-foreach my $as (@asorder) {
-	print STATSFILE "$as";
+foreach my $as (keys %{ $astraffic }) {
+
+	$query = "insert into stats values('$as'";
 	
 	foreach my $link (@links) {
-		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_in"});
-		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_out"});
-		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_v6_in"});
-		print STATSFILE "\t" . undefaszero($astraffic->{$as}->{"${link}_v6_out"});
+		$query .= ", '" . undefaszero($astraffic->{$as}->{"${link}_in"}) . "'";
+		$query .= ", '" . undefaszero($astraffic->{$as}->{"${link}_out"}) . "'";
+		$query .= ", '" . undefaszero($astraffic->{$as}->{"${link}_v6_in"}) . "'";
+		$query .= ", '" . undefaszero($astraffic->{$as}->{"${link}_v6_out"}) . "'";
 	}
-	
-	print STATSFILE "\n";
+	$query .= ');';
+	$db->do($query);
 }
 
-close(STATSFILE);
-
+$db->disconnect();
 rename("$statsfile.tmp", $statsfile);
 
 sub undefaszero {
