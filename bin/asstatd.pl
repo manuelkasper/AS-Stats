@@ -12,6 +12,7 @@ use IO::Socket;
 use RRDs;
 use Getopt::Std;
 use Scalar::Util qw(looks_like_number);
+use ip2as;
 
 my %knownlinks;
 my %link_samplingrates;
@@ -39,7 +40,7 @@ my $v10_templates = {};
 my $sflow_server_port = 6343;
 
 use vars qw/ %opt /;
-getopts('r:p:P:k:a:n', \%opt);
+getopts('r:p:P:k:a:nm:', \%opt);
 
 my $usage = "$0 [-rpPka]\n".
 	"\t-r <path to RRD files>\n".
@@ -47,12 +48,14 @@ my $usage = "$0 [-rpPka]\n".
 	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
 	"\t-k <path to known links file>\n".
 	"\t-a <your own AS number> - only required for sFlow\n".
-	"\t-n enable peer-as statistics\n";
+	"\t-n enable peer-as statistics\n".
+	"\t-m IP<->ASN mapping\n";
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
 my $myas_opt = $opt{'a'};
 my $peerasstats = $opt{'n'};
+my $mapping = $opt{'m'};
 
 die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile));
 
@@ -129,6 +132,13 @@ if ($sflow_server_port > 0) {
 
 my ($him,$datagram,$flags);
 
+if (defined($mapping)) {
+	ip2as::init($mapping);
+} else {
+	#I don't use the mapping, to use an empty one
+	ip2as::init('/dev/null');
+}
+
 # main datagram receive loop
 while (1) {
 	while (my @ready = $sel->can_read) {
@@ -160,6 +170,18 @@ while (1) {
 	}
 }
 
+sub replace_asn {
+	my $ip = shift;
+	my $asn = shift;
+
+	my $new_asn = ip2as::getas4ip($ip);
+	if (defined($new_asn)) {
+		return $new_asn;
+	} else {
+		return $asn;
+	}
+}
+
 sub parse_netflow_v5 {
 	my $datagram = shift;
 	my $ipaddr = shift;
@@ -173,8 +195,14 @@ sub parse_netflow_v5 {
 	for (my $i = 0; $i < $count; $i++) {
 		my $flowrec = substr($datagram, $v5_header_len + ($i*$v5_flowrec_len), $v5_flowrec_len);
 		my @flowdata = unpack("NNNnnNNNNnnccccnnccN", $flowrec);
-		#print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[6] srcas: $flowdata[15] dstas: $flowdata[16] in: $flowdata[3] out: $flowdata[4] 4 \n";
-		handleflow($ipaddr, $flowdata[6], $flowdata[15], $flowdata[16], $flowdata[3], $flowdata[4], 4, 'netflow');
+		my $srcip = join '.', unpack 'C4', pack 'N', $flowdata[0];
+		my $dstip = join '.', unpack 'C4', pack 'N', $flowdata[1];
+
+		my $srcas = replace_asn($srcip, $flowdata[15]);
+		my $dstas = replace_asn($dstip, $flowdata[16]);
+
+		#print "ipaddr: " . inet_ntoa($ipaddr) . " octets: $flowdata[6] srcas: $srcas dstas: $dstas in: $flowdata[3] out: $flowdata[4] 4 \n";
+		handleflow($ipaddr, $flowdata[6], $srcas, $dstas, $flowdata[3], $flowdata[4], 4, 'netflow');
 	}
 }
 
