@@ -591,6 +591,42 @@ sub parse_sflow {
 			}
 		}
 		
+		# Extract src & dst IP from packet's header
+		my $srcip = undef;
+		my $dstip= undef;
+		my (undef, $ethertype, $ipdata) = unpack('a12H4a*', $sFlowSample->{'HeaderBin'});
+		if($ethertype eq 8100){
+			(undef, $ethertype, $ipdata) = unpack('nH4a*', $ipdata);
+		}
+
+		if($ethertype eq '0800'){
+			(undef, undef, undef, $srcip, $dstip) = unpack('nnB64NN', $ipdata);
+			$srcip = join '.', unpack 'C4', pack 'N', $srcip;
+			$dstip = join '.', unpack 'C4', pack 'N', $dstip;
+		}
+
+		if($ethertype eq '86dd'){
+			(undef, $sFlowSample->{HeaderDatalen}, undef, $srcip, $dstip) = unpack('NnnB128B128', $ipdata);
+			my @array_src = ( $srcip =~ m/......../g );
+			my @array_dst = ( $dstip =~ m/......../g );
+			$srcip = '';
+			$dstip = '';
+			for(my $x = 0; $x < scalar @array_src; $x = $x + 2){
+				$srcip .= sprintf("%02x%02x:", oct("0b$array_src[$x]"), oct("0b$array_src[$x + 1]"));
+			}
+			chop($srcip);
+
+			for(my $x = 0; $x < scalar @array_dst; $x = $x + 2){
+				$dstip .= sprintf("%02x%02x:", oct("0b$array_dst[$x]"), oct("0b$array_dst[$x + 1]"));
+			}
+			chop($dstip);
+		}
+
+		if (defined($srcip) && defined($dstip)){
+			$srcas = replace_asn($srcip, $srcas);
+			$dstas = replace_asn($dstip, $dstas);
+		}
+
 		# Outbound packets have our AS number as the source (GatewayAsSource),
 		# while inbound packets have 0 as the destination (empty AsPath).
 		# Transit packets have "foreign" AS numbers for both source and 
