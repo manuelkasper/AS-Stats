@@ -595,7 +595,7 @@ sub parse_sflow {
 		my $srcip = undef;
 		my $dstip= undef;
 		my (undef, $ethertype, $ipdata) = unpack('a12H4a*', $sFlowSample->{'HeaderBin'});
-		if($ethertype eq 8100){
+		if($ethertype eq '8100'){
 			(undef, $ethertype, $ipdata) = unpack('nH4a*', $ipdata);
 		}
 
