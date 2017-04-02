@@ -45,6 +45,7 @@ Prerequisites
 - libdbd-sqlite3-perl
 - one or more routers than can generate NetFlow v8/v9 AS aggregation records
   or sFlow samples
+- ip2as.pm, for additional lookup (https://github.com/JackSlateur/perl-ip2as)
 
 Considerations
 -------------
