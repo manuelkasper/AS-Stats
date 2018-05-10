@@ -8,11 +8,11 @@ $default_graph_height = 360;
 
 /* Size of graphs on top N AS page */
 $top_graph_width = 600;
-$top_graph_height = 220;
+$top_graph_height = 250;
 
 /* Size of graphs on AS-Set page */
 $asset_graph_width = 600;
-$asset_graph_height = 200;
+$asset_graph_height = 250;
 
 /* Defaults for other settings, introduced in recent versions */
 $vertical_label = true;			# vertical IN/OUT label in graph
