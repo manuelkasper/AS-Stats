@@ -22,7 +22,12 @@ if (isset($_GET['height']))
 $v6_el = "";
 if (@$_GET['v'] == 6)
 	$v6_el = "v6_";
-
+$mixv4v6 = false;
+$versionstring = @$_GET['v'];
+if (@$_GET['v'] == 0 || @$_GET['v'] == 10 || @$_GET['v'] == 46 || @$_GET['v'] == 64) {
+        $mixv4v6 = true;
+        $versionstring = '4 + IPv6';
+}
 if(isset($_GET['peerusage']) && $_GET['peerusage'] == '1')
 	$peerusage = 1;
 else
@@ -44,6 +49,18 @@ if(isset($_GET['selected_links'])){
 	}
 
 	$knownlinks = $links;
+}
+
+if ($mixv4v6) {
+    $v6links = array();
+    foreach ($knownlinks as $v4link) {
+                    $tag6 = $v4link['tag']."_v6";
+                    $link = array('tag' => $tag6,
+                                    'color' => $v4link['color'],
+                                    'descr' => $v4link['descr']);
+                    $v6links[] = $link;
+    }
+    $knownlinks = array_merge($knownlinks, $v6links);
 }
 
 $rrdfile = getRRDFileForAS($as, $peerusage);
@@ -74,7 +91,7 @@ if($showtitledetail && @$_GET['dname'] != "")
 	$cmd .= "--title " . escapeshellarg($_GET['dname']) . " ";
 else
 	if (isset($_GET['v']) && is_numeric($_GET['v']))
-		$cmd .= "--title IPv" . $_GET['v'] . " ";
+		$cmd .= "--title IPv" . $versionstring . " ";
 
 if (isset($_GET['nolegend']))
 	$cmd .= "--no-legend ";

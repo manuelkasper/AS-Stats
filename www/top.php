@@ -19,6 +19,12 @@ $hours = 24;
 if (@$_GET['numhours'])
 	$hours = (int)$_GET['numhours'];
 
+$mixv4v6 = false;
+if (isset($_GET['mixv4v6'])) {
+    $mixv4v6 = $_GET['mixv4v6'];
+    $showv6 = false;
+}
+
 if ($peerusage)
 	$statsfile = $daypeerstatsfile;
 else {
@@ -82,9 +88,13 @@ $class = (($i % 2) == 0) ? "even" : "odd";
 		</div>
 		<div class="small">IPv4: ~ <?php echo format_bytes($nbytes[0]); ?> in / 
 			<?php echo format_bytes($nbytes[1]); ?> out in the last <?php echo $label?></div>
-		<?php if ($showv6): ?>
+		<?php if ($showv6 || $mixv4v6): ?>
 		<div class="small">IPv6: ~ <?php echo format_bytes($nbytes[2]); ?> in / 
 			<?php echo format_bytes($nbytes[3]); ?> out in the last <?php echo $label?></div>
+		<?php endif; ?>
+		<?php if ($mixv4v6): ?>
+		<div class="small">Total: ~ <?php echo format_bytes($nbytes[0]+$nbytes[2]); ?> in / 
+			<?php echo format_bytes($nbytes[1]+$nbytes[3]); ?> out in the last <?php echo $label?></div>
 		<?php endif; ?>
 
 <?php if (!empty($customlinks)): ?>
@@ -106,7 +116,11 @@ echo join(" | ", $htmllinks);
 	</th>
 	<td>
 		<?php
-		echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
+                if ($mixv4v6) {
+                    echo getHTMLUrl($as, 0, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
+                } else {
+                    echo getHTMLUrl($as, 4, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
+                }
 		if ($showv6)
 			echo getHTMLUrl($as, 6, $asinfo['descr'], $start, $end, $peerusage, $selected_links);
 		?>
@@ -120,6 +134,7 @@ echo join(" | ", $htmllinks);
 <form method='get'>
 <input type='hidden' name='numhours' value='<?php echo $hours; ?>'/>
 <input type='hidden' name='n' value='<?php echo $ntop; ?>'/>
+<input type="checkbox" name="mixv4v6" value="true" <?php if($mixv4v6) echo 'checked'; ?>>Add v4+v6</input>
 <table>
 <?php
 $knownlinks = getknownlinks();

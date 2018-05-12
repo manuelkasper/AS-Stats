@@ -238,7 +238,11 @@ function getHTMLImg($as, $ipversion, $desc, $start, $end, $peerusage, $alt, $cla
 	global $top_graph_width;
 	global $top_graph_height;
 
-	$dname = rawurlencode("AS$as - $desc - IPV$ipversion");
+        $ipvstring = "$ipversion";
+        if($ipversion == 0 || $ipversion == 46 || $ipversion == 64)
+                $ipvstring = "4+IPv6";
+
+	$dname = rawurlencode("AS$as - $desc - IPv$ipvstring");
 
 	$result = "<img alt='$alt' class='$class' src='gengraph.php?v=$ipversion&as=$as&peerusage=$peerusage&dname=$dname&start=$start&end=$end";
 	if(!$history)
