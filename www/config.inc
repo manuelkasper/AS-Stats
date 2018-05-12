@@ -2,23 +2,23 @@
 
 /* changes these values to suit your local configuration */
 
-$rrdpath = "/var/cache/as-stats/rrd";
-$daystatsfile = "/var/cache/as-stats/asstats_day.sqlite";
+$rrdpath = "/data/as-stats/rrd";
+$daystatsfile = "/data/as-stats/asstats_day.txt";
 $rrdtool = "/usr/bin/rrdtool";
 
-$daypeerstatsfile = "/var/cache/as-stats/peerasstats_day.txt";
+$daypeerstatsfile = "/data/as-stats/peerasstats_day.txt";
 $showpeeras = false;
 
 $asinfofile = "asinfo.txt";
-$knownlinksfile = "/opt/AS-Stats/conf/knownlinks";
-$outispositive = false;
+$knownlinksfile = "/data/as-stats/conf/knownlinks";
+$outispositive = true;
 $show95th = true;
 
-$ntop = 100;
+$ntop = 20;
 $showv6 = true;
 $showtitledetail = true;
 $vertical_label = true;			# vertical IN/OUT label in graph
-$brighten_negative = false;		# brighten the "negative" part of graphs
+$brighten_negative = true;		# brighten the "negative" part of graphs
 
 $whois = "/usr/bin/whois";
 $assetpath = "asset";
@@ -45,13 +45,12 @@ $top_intervals[] = array(
 	'statsfile' => '/data/as-stats/asstats_week.txt',
 	'label' => '1 week'
 );
-*/
 $top_intervals[] = array(
 	'hours' => 30*24,
-	'statsfile' => '/var/cache/as-stats/asstats_month.sqlite',
+	'statsfile' => '/data/as-stats/asstats_month.txt',
 	'label' => '30 days'
 );
-/**/
+*/
 
 
 /* END - no closing php tag needed here (prevents problems with stray whitespace) */
