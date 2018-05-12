@@ -7,6 +7,7 @@
 
 use strict;
 use 5.010;
+use Socket qw(AF_INET6 inet_pton inet_ntop);
 use IO::Select;
 use IO::Socket;
 use RRDs;
@@ -77,7 +78,7 @@ if ($sflow_server_port == $server_port) {
 }
 
 my %myas;
-if($sflow_server_port > 0){
+if($sflow_server_port > 0 || defined($myas_opt)){
 	die('No ASN found, please specify -a') if !defined($myas_opt);
 	%myas = map {$_ => 1 } split(',', $myas_opt);
 	for my $i (%myas){
@@ -306,6 +307,7 @@ sub parse_netflow_v9_data_flowset {
 	while (($ofs + $len) <= $datalen) {
 		# Interpret values according to template
 		my ($inoctets, $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, $vlanin, $vlanout);
+                my ($srcip, $dstip);
 
 		$inoctets = 0;
 		$outoctets = 0;
@@ -356,7 +358,11 @@ sub parse_netflow_v9_data_flowset {
 				}
 			} elsif ($cur_fldtype == 60) {	# IP_PROTOCOL_VERSION
 				$ipversion = unpack("C", $cur_fldval);
-			} elsif ($cur_fldtype == 27 || $cur_fldtype == 28) {	# IPV6_SRC_ADDR/IPV6_DST_ADDR
+			} elsif ($cur_fldtype == 27) {	# IPV6_SRC_ADDR
+                                $srcip = inet_ntop(AF_INET6, $cur_fldval);
+				$ipversion = 6;
+			} elsif ($cur_fldtype == 28) {	# IPV6_DST_ADDR
+                                $dstip = inet_ntop(AF_INET6, $cur_fldval);
 				$ipversion = 6;
 			} elsif ($cur_fldtype == 58) {  # SRC_VLAN
 				$vlanin = unpack("n", $cur_fldval);
@@ -365,7 +371,16 @@ sub parse_netflow_v9_data_flowset {
 			}
 		}
 	
-		if (defined($srcas) && defined($dstas) && defined($snmpin) && defined($snmpout)) {
+		if (defined($snmpin) && defined($snmpout)) {
+                        if (not (defined($srcas))) { $srcas=0; }
+                        if (not (defined($dstas))) { $dstas=0; }
+                        if ($srcas == 0 && $dstas == 0 && $ipversion == 6 && defined($srcip) && defined($dstip)) {
+                                $srcas = replace_asn($srcip, $srcas);
+                                $dstas = replace_asn($dstip, $dstas);
+                                # substitute 0 for own AS number
+                                if ($myas{$srcas}) { $srcas = 0; }
+                                if ($myas{$dstas}) { $dstas = 0; }
+                        }
 			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow', $vlanin, $vlanout);
 		}
 	}
