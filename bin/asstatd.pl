@@ -364,6 +364,12 @@ sub parse_netflow_v9_data_flowset {
 			} elsif ($cur_fldtype == 28) {	# IPV6_DST_ADDR
                                 $dstip = inet_ntop(AF_INET6, $cur_fldval);
 				$ipversion = 6;
+			} elsif ($cur_fldtype == 8) {	# IPV4_SRC_ADDR
+				$srcip = inet_ntop(AF_INET, $cur_fldval);
+				$ipversion = 4;
+			} elsif ($cur_fldtype == 12) {	# IPV4_DST_ADDR
+				$dstip = inet_ntop(AF_INET, $cur_fldval);
+				$ipversion = 4;
 			} elsif ($cur_fldtype == 58) {  # SRC_VLAN
 				$vlanin = unpack("n", $cur_fldval);
 			} elsif ($cur_fldtype == 59) {  # SRC_VLAN
@@ -374,7 +380,7 @@ sub parse_netflow_v9_data_flowset {
 		if (defined($snmpin) && defined($snmpout)) {
                         if (not (defined($srcas))) { $srcas=0; }
                         if (not (defined($dstas))) { $dstas=0; }
-                        if ($srcas == 0 && $dstas == 0 && $ipversion == 6 && defined($srcip) && defined($dstip)) {
+                        if ($srcas == 0 && $dstas == 0 && defined($srcip) && defined($dstip)) {
                                 $srcas = replace_asn($srcip, $srcas);
                                 $dstas = replace_asn($dstip, $dstas);
                                 # substitute 0 for own AS number
