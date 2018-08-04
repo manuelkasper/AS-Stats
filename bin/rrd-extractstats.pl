@@ -51,9 +51,9 @@ foreach my $rrdfile (@rrdfiles) {
 }
 print "\n";
 
-my $query = 'create table stats(asn int';
+my $query = 'create table stats("asn" int';
 foreach my $link (@links) {
-	$query .= ", ${link}_in int, ${link}_out int, ${link}_v6_in int, ${link}_v6_out int";
+	$query .= ", \"${link}_in\" int, \"${link}_out\" int, \"${link}_v6_in\" int, \"${link}_v6_out\" int";
 }
 $query .= ');';
 
