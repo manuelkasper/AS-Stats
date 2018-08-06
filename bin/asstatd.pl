@@ -7,7 +7,7 @@
 
 use strict;
 use 5.010;
-use Socket qw(AF_INET6 inet_pton inet_ntop);
+use Socket qw(AF_INET6 inet_ntop);
 use IO::Select;
 use IO::Socket;
 use RRDs;
