@@ -112,9 +112,9 @@ function getasstats_top($ntop, $statfile, $selected_links) {
 	$query_total = '0';
 	$query_links = '';
 	foreach($selected_links as $tag){
-		$query_links .= "${tag}_in, ${tag}_out, ${tag}_v6_in, ${tag}_v6_out, ";
+		$query_links .= "\"${tag}_in\", \"${tag}_out\", \"${tag}_v6_in\", \"${tag}_v6_out\", ";
 		$nlinks += 4;
-		$query_total .= " + ${tag}_in + ${tag}_out + ${tag}_v6_in + ${tag}_v6_out";
+		$query_total .= " + \"${tag}_in\" + \"${tag}_out\" + \"${tag}_v6_in\" + \"${tag}_v6_out\"";
 	}
 	$query = "select asn, $query_links $query_total as total from stats order by total desc limit $ntop";
 
