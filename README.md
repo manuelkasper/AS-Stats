@@ -256,6 +256,38 @@ Installation
 				}
 			}
 		}
+  Huawei NE Netstream (netflow) config:
+  
+ 		slot 3 
+		 ip netstream sampler to slot self
+ 		 ip netstream export host 192.168.200.1 8999
+		!
+		ip netstream as-mode 32
+		ip netstream timeout active 1
+		ip netstream timeout inactive 15
+		ip netstream export version 9 origin-as
+		ip netstream export index-switch 32
+		ip netstream export template timeout-rate 2
+		ip netstream sampler random-packets 2048 inbound
+		ip netstream sampler random-packets 2048 outbound
+		ip netstream export source 192.168.200.48
+		ip netstream export template option sampler
+		ip netstream export template option application-label
+		
+		ip netstream aggregation as
+ 		export version 9
+ 		template timeout-rate 2
+ 		ip netstream export source 192.168.200.48
+ 		ip netstream export host 192.168.200.1 8999
+
+
+  If you configured a physical interface, use its IfIndex, if you configured a L3 Vlanif, use this ones IfIndex. It should a double decimal value like 72 or 68, etc. Note the interface should contain following config:
+  
+  		interface vlanif 120
+		 ip netstream inbound
+		 ip netstream outbound
+		!
+
 
 
 - sFlow only:
