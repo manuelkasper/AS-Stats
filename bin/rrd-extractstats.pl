@@ -44,6 +44,11 @@ my $i :shared = 0;
 
 my $cpus = do { local @ARGV='/proc/cpuinfo'; grep /^processor\s+:/, <>;};
 my $num_workers	= $cpus / 2;
+if (($ENV{'THREADS'} =~ /^\d+$/) and ($ENV{'THREADS'} > 0)) { 
+    $num_workers = $ENV{'THREADS'};
+}
+print("Using " . $num_workers . " threads.\n");
+
 my $num_work_units = scalar @rrdfiles;
 
 my $q = Thread::Queue->new();
