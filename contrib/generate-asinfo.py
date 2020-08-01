@@ -27,7 +27,7 @@ for line in sys.stdin:
 		macro = 'UNSPECIFIED'
 		name = data
 
- 	if name.startswith('- '):
+	if name.startswith('- '):
 		name = name[2:]
 
-	print "%s\t%s\t%s\t%s" % (asn,macro,name,country)
+	print("%s\t%s\t%s\t%s" % (asn,macro,name,country))
