@@ -4,30 +4,31 @@
 import sys
 
 for line in sys.stdin:
-	try:
-		asn,country,_,_,data = [_.strip() for _ in line.split('|')]
-	except ValueError:
-		continue
+    try:
+        asn,country,_,_,data = [_.strip() for _ in line.split('|')]
+    except ValueError:
+        continue
 
-	try:
-		data,country = data.rsplit(',',1)
-	except:
-		data = data
+    try:
+        data,country = data.rsplit(',',1)
+        country = country.strip()
+    except:
+        data = data
 
-	if data == '-Private Use AS-':
-		data = 'Private Use AS'
+    if data == '-Private Use AS-':
+        data = 'Private Use AS'
 
-	try:
-		macro,name = data.split(' ',1)
-	except:
-		macro = data
-		name = data
+    try:
+        macro,name = data.split(' ',1)
+    except:
+        macro = data
+        name = data
 
-	if not (macro.count('-') or macro.upper() == macro or name.startswith('- ')) or macro == 'UK':
-		macro = 'UNSPECIFIED'
-		name = data
+    if not (macro.count('-') or macro.upper() == macro or name.startswith('- ')) or macro == 'UK':
+        macro = 'UNSPECIFIED'
+        name = data
 
- 	if name.startswith('- '):
-		name = name[2:]
+    if name.startswith('- '):
+        name = name[2:]
 
-	print "%s\t%s\t%s\t%s" % (asn,macro,name,country)
+    print("%s\t%s\t%s,%s\t%s" % (asn,macro,name,country,country))
