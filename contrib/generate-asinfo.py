@@ -31,4 +31,4 @@ for line in sys.stdin:
     if name.startswith('- '):
         name = name[2:]
 
-    print("%s\t%s\t%s\t%s" % (asn,macro,name,country))
+    print("%s\t%s\t%s,%s\t%s" % (asn,macro,name,country,country))
