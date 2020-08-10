@@ -54,7 +54,7 @@ try {
 	my $sth = $db->prepare("SELECT asn, checked_at FROM stats") or die('field missing');
 	$sth->execute();
 	while(my($item, $data) = $sth->fetchrow_array()) {
-		as_list->{$item} = $data;
+		$as_list->{$item} = $data;
 	}
 
 	$db_version = 2;
