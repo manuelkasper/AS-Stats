@@ -380,13 +380,17 @@ sub parse_netflow_v9_data_flowset {
 		if (defined($snmpin) && defined($snmpout)) {
                         if (not (defined($srcas))) { $srcas=0; }
                         if (not (defined($dstas))) { $dstas=0; }
-                        if ($srcas == 0 && $dstas == 0 && defined($srcip) && defined($dstip)) {
-                                $srcas = replace_asn($srcip, $srcas);
-                                $dstas = replace_asn($dstip, $dstas);
-                                # substitute 0 for own AS number
-                                if ($myas{$srcas}) { $srcas = 0; }
-                                if ($myas{$dstas}) { $dstas = 0; }
-                        }
+			if defined($srcip) {
+				$srcas = replace_asn($srcip, $srcas);
+			}
+
+			if defined($dstip) {
+				$dstas = replace_asn($dstip, $dstas);
+			}
+
+			# substitute 0 for own AS number
+			if ($myas{$srcas}) { $srcas = 0; }
+			if ($myas{$dstas}) { $dstas = 0; }
 			handleflow($ipaddr, $inoctets + $outoctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'netflow', $vlanin, $vlanout);
 		}
 	}
