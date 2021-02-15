@@ -380,11 +380,11 @@ sub parse_netflow_v9_data_flowset {
 		if (defined($snmpin) && defined($snmpout)) {
                         if (not (defined($srcas))) { $srcas=0; }
                         if (not (defined($dstas))) { $dstas=0; }
-			if defined($srcip) {
+			if (defined($srcip)) {
 				$srcas = replace_asn($srcip, $srcas);
 			}
 
-			if defined($dstip) {
+			if (defined($dstip)) {
 				$dstas = replace_asn($dstip, $dstas);
 			}
 
