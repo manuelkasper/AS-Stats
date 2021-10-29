@@ -544,15 +544,15 @@ sub parse_netflow_v10_data_flowset {
 sub parse_sflow {
 	my $datagram = shift;
 	my $ipaddr = shift;
-	
+
 	# decode the sFlow packet
 	my ($sFlowDatagramRef, $sFlowSamplesRef, $errorsRef) = Net::sFlow::decode($datagram);
-	
+
 	if ($sFlowDatagramRef->{'sFlowVersion'} != 5) {
 		print "Warning: non-v5 packet received - not supported\n";
 		return;
 	}
-	
+
 	# use agent IP if available (in case of proxy)
 	if ($sFlowDatagramRef->{'AgentIp'}) {
 		$ipaddr = inet_aton($sFlowDatagramRef->{'AgentIp'});
@@ -560,10 +560,10 @@ sub parse_sflow {
 	
 	foreach my $sFlowSample (@{$sFlowSamplesRef}) {
 		my $ipversion = 4;
-		
+
 		# only process standard structures
 		next if ($sFlowSample->{'sampleTypeEnterprise'} != 0);
-		
+
 		my $snmpin;
 		my $snmpout;
 		if ($sFlowSample->{'sampleTypeFormat'} == 1) {
@@ -577,11 +577,10 @@ sub parse_sflow {
 		} else {
 			next;
 		}
-		
-		if ($snmpin >= 1073741823 || $snmpout >= 1073741823) {
-			# invalid interface index - could be dropped packet or internal
-			# (routing protocol, management etc.)
-			#print "Invalid interface index $snmpin/$snmpout\n";
+
+		if ($snmpin > 2147483647 || $snmpout > 2147483647) {
+			# invalid RFC 2863 ifIndex
+			print "Invalid interface index $snmpin/$snmpout\n";
 			next;
 		}
 
@@ -602,7 +601,7 @@ sub parse_sflow {
 				$ipversion = 6;
 			}
 		}
-		
+
 		my $srcas = 0;
 		my $dstas = 0;
 		
@@ -657,7 +656,7 @@ sub parse_sflow {
 		# Transit packets have "foreign" AS numbers for both source and 
 		# destination (handleflow() currently deals with those by counting
 		# them twice; once for input and once for output)
-		
+
 		# substitute 0 for own AS number
 		if ($myas{$srcas}) {
 			$srcas = 0;
@@ -678,32 +677,32 @@ sub parse_sflow {
 		handleflow($ipaddr, $noctets, $srcas, $dstas, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout);
 
 		if ($peerasstats) {
-    		# srcpeeras is the one who sent me data
-    		# dstpeeras is the first one to which you'll send the data
-    		# so, dstpeeras is the first entry in array
-    		# if the array is now empty (poped before), then take $dstas
-    		my $srcpeeras = ($sFlowSample->{'GatewayAsSourcePeer'}) ? $sFlowSample->{'GatewayAsSourcePeer'} : 0;
-    		my $dstpeeras = 0;
+			# srcpeeras is the one who sent me data
+			# dstpeeras is the first one to which you'll send the data
+			# so, dstpeeras is the first entry in array
+			# if the array is now empty (poped before), then take $dstas
+			my $srcpeeras = ($sFlowSample->{'GatewayAsSourcePeer'}) ? $sFlowSample->{'GatewayAsSourcePeer'} : 0;
+			my $dstpeeras = 0;
 
-    		if ($sFlowSample->{'GatewayDestAsPaths'}) {
-    			$dstpeeras = @{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}}[0];
-    			if (!$dstpeeras) {
-    				$dstpeeras = 0;
-    			}
-    		}
-    		if($dstpeeras == 0 && $dstas != 0){
-    			$dstpeeras = $dstas;
-    		}
+			if ($sFlowSample->{'GatewayDestAsPaths'}) {
+				$dstpeeras = @{$sFlowSample->{'GatewayDestAsPaths'}->[0]->{'AsPath'}}[0];
+				if (!$dstpeeras) {
+					$dstpeeras = 0;
+				}
+			}
+			if($dstpeeras == 0 && $dstas != 0){
+				$dstpeeras = $dstas;
+			}
 
-		if ($myas{$srcpeeras}) {
-    			$srcpeeras = 0;
-    		}
-		if ($myas{$dstpeeras}) {
-    			$dstpeeras = 0;
-    		}
-		    
-		    if ($srcpeeras != 0 || $dstpeeras != 0) {
-			    handleflow($ipaddr, $noctets, $srcpeeras, $dstpeeras, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout, 1);
+			if ($myas{$srcpeeras}) {
+				$srcpeeras = 0;
+			}
+			if ($myas{$dstpeeras}) {
+				$dstpeeras = 0;
+			}
+
+			if ($srcpeeras != 0 || $dstpeeras != 0) {
+				handleflow($ipaddr, $noctets, $srcpeeras, $dstpeeras, $snmpin, $snmpout, $ipversion, 'sflow', $vlanin, $vlanout, 1);
 			}
 		}
 	}
