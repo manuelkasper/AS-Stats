@@ -39,6 +39,7 @@ my %knownlinks;
 read_knownlinks();
 
 my @links = values %knownlinks;
+@links = sort @links;
 
 # If the DB has it, get latest check timestamp for every ASN we are aware of
 my $db_version = 1;
