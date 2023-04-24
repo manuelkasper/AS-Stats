@@ -38,7 +38,7 @@ my %knownlinks;
 
 read_knownlinks();
 
-my @links = values %knownlinks;
+my @links = sort values %knownlinks;
 
 # If the DB has it, get latest check timestamp for every ASN we are aware of
 my $db_version = 1;
@@ -50,8 +50,23 @@ try {
 	}
 	$db = DBI->connect("dbi:SQLite:dbname=$statsfile.tmp", '', '');
 
+	# Check if table has expected schema
+	my $sth = $db->prepare("SELECT name FROM PRAGMA_TABLE_INFO('stats')") or die ("can't check stats table schema");
+	$sth->execute();
+	($sth->fetchrow_array eq 'asn') or die('schema mismatch');
+	($sth->fetchrow_array eq 'checked_at') or die('schema mismatch');
+
+	foreach my $link (@links) {
+		($sth->fetchrow_array eq "${link}_in") or die('schema mismatch');
+		($sth->fetchrow_array eq "${link}_out") or die('schema mismatch');
+		($sth->fetchrow_array eq "${link}_v6_in") or die('schema mismatch');
+		($sth->fetchrow_array eq "${link}_v6_out") or die('schema mismatch');
+	}
+	# Make sure there are no more unexpected fields
+	!defined $sth->fetchrow_array or die('schema mismatch');
+
 	# Get last check timestamps
-	my $sth = $db->prepare("SELECT asn, checked_at FROM stats") or die('field missing');
+	$sth = $db->prepare("SELECT asn, checked_at FROM stats") or die('field missing');
 	$sth->execute();
 	while(my($item, $data) = $sth->fetchrow_array()) {
 		$as_list->{$item} = $data;
@@ -59,7 +74,7 @@ try {
 
 	$db_version = 2;
 } catch ($e) {
-	print("Previously generated database not found or checked_at field is missing, proceed with all RRD files. ($e)\n");
+	print("Previously generated database not found or database schema mismatch, proceed with all RRD files. ($e)\n");
 }
 
 # walk through all RRD files in the given path and extract stats for all links
