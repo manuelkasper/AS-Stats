@@ -7,9 +7,10 @@
 
 use strict;
 use 5.010;
-use Socket qw(AF_INET6 inet_ntop);
+use Socket qw(AF_INET6 inet_pton inet_ntop);
 use IO::Select;
 use IO::Socket;
+use IO::Socket::IP;
 use RRDs;
 use Getopt::Std;
 use Scalar::Util qw(looks_like_number);
@@ -41,22 +42,25 @@ my $v10_templates = {};
 my $sflow_server_port = 6343;
 
 use vars qw/ %opt /;
-getopts('r:p:P:k:a:nm:', \%opt);
+getopts('r:p:P:k:a:6nm:', \%opt);
 
-my $usage = "$0 [-rpPka]\n".
+my $usage = "$0 [-rpPka6]\n".
 	"\t-r <path to RRD files>\n".
 	"\t(-p <NetFlow UDP listen port - default $server_port, use 0 to disable NetFlow)\n".
 	"\t(-P <sFlow UDP listen port - default $sflow_server_port, use 0 to disable sFlow)\n".
 	"\t-k <path to known links file>\n".
 	"\t-a <your own AS number> - only required for sFlow\n".
 	"\t-n enable peer-as statistics\n".
-	"\t-m IP<->ASN mapping\n";
+	"\t-m IP<->ASN mapping\n".
+	"\t-6 bind to an IPv6 address instead of IPv4.";
 
 my $rrdpath = $opt{'r'};
 my $knownlinksfile = $opt{'k'};
 my $myas_opt = $opt{'a'};
 my $peerasstats = $opt{'n'};
 my $mapping = $opt{'m'};
+my $use_six = $opt{'6'};
+
 
 die("$usage") if (!defined($rrdpath) || !defined($knownlinksfile));
 
@@ -117,21 +121,23 @@ read_knownlinks();
 my ($lsn_nflow, $lsn_sflow);
 my $sel = IO::Select->new();
 
+my $host = $use_six ? "::" : undef;
+
 # prepare to listen for NetFlow UDP packets
 if ($server_port > 0) {
-	$lsn_nflow = IO::Socket::INET->new(LocalPort => $server_port, Proto => "udp")
+	$lsn_nflow = IO::Socket::IP->new(LocalHost => $host, LocalService => $server_port, Proto => "udp")
 		or die "Couldn't be a NetFlow UDP server on port $server_port : $@\n";
 	$sel->add($lsn_nflow);
 }
 # prepare to listen for sFlow UDP packets
 if ($sflow_server_port > 0) {
 	require Net::sFlow;
-	$lsn_sflow = IO::Socket::INET->new(LocalPort => $sflow_server_port, Proto => "udp")
+	$lsn_sflow = IO::Socket::IP->new(LocalHost => $host, LocalService => $sflow_server_port, Proto => "udp")
 		or die "Couldn't be a sFlow UDP server on port $sflow_server_port : $@\n";
 	$sel->add($lsn_sflow);
 }
 
-my ($him,$datagram,$flags);
+my ($him,$datagram,$flags,$ipaddr);
 
 if (defined($mapping)) {
 	ip2as::init($mapping);
@@ -146,12 +152,12 @@ while (1) {
 		foreach my $server (@ready) {
 			$him = $server->recv($datagram, $MAXREAD);
 			next if (!$him);
-			
-			my ($port, $ipaddr) = sockaddr_in($server->peername);
-			
+
+			$ipaddr = $server->peeraddr;
+
 			if (defined($lsn_nflow) && $server == $lsn_nflow) {
 				my ($version) = unpack("n", $datagram);
-				
+
 				if ($version == 5) {
 					parse_netflow_v5($datagram, $ipaddr);
 				} elsif ($version == 8) {
@@ -555,9 +561,13 @@ sub parse_sflow {
 
 	# use agent IP if available (in case of proxy)
 	if ($sFlowDatagramRef->{'AgentIp'}) {
-		$ipaddr = inet_aton($sFlowDatagramRef->{'AgentIp'});
+		if ($sFlowDatagramRef->{'AgentIpVersion'} == Net::sFlow->IPv4) {
+			$ipaddr = inet_pton(AF_INET, $sFlowDatagramRef->{'AgentIp'});
+		} else {
+			$ipaddr = inet_pton(AF_INET6, $sFlowDatagramRef->{'AgentIp'});
+		}
 	}
-	
+
 	foreach my $sFlowSample (@{$sFlowSamplesRef}) {
 		my $ipversion = 4;
 
@@ -594,7 +604,7 @@ sub parse_sflow {
 			$noctets = $sFlowSample->{'HeaderFrameLength'} - 14;
 
 			# make one more attempt at figuring out the IP version
-			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) && 
+			if ((defined($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
 				looks_like_number($sFlowSample->{'GatewayIpVersionNextHopRouter'}) &&
 				$sFlowSample->{'GatewayIpVersionNextHopRouter'} == 2) ||
 				(defined($sFlowSample->{'HeaderType'}) && $sFlowSample->{'HeaderType'} eq '86dd')) {
@@ -722,49 +732,51 @@ sub handleflow {
 	my $direction;
 	my $ifalias;
 	my $as;
-	
+	my $routername = inet_ntop($use_six ? AF_INET6 : AF_INET, $routerip);
+
 	if ($srcas == 0) {
 		$as = $dstas;
 		$direction = "out";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpout . '/' . $vlanout} if defined($vlanout);
-		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpout};
+		$ifalias = $knownlinks{$routername . '_' . $snmpout . '/' . $vlanout} if defined($vlanout);
+		$ifalias //= $knownlinks{$routername . '_' . $snmpout};
 	} elsif ($dstas == 0) {
 		$as = $srcas;
 		$direction = "in";
-		$ifalias = $knownlinks{inet_ntoa($routerip) . '_' . $snmpin . '/' . $vlanin} if defined($vlanin);
-		$ifalias //= $knownlinks{inet_ntoa($routerip) . '_' . $snmpin};
+		$ifalias = $knownlinks{$routername . '_' . $snmpin . '/' . $vlanin} if defined($vlanin);
+		$ifalias //= $knownlinks{$routername . '_' . $snmpin};
 	} else {
 		handleflow($routerip, $noctets, $srcas, 0, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout, $peeras);
 		handleflow($routerip, $noctets,	0, $dstas, $snmpin, $snmpout, $ipversion, $type, $vlanin, $vlanout, $peeras);
 		return;
 	}
-	
+
 	if (!$ifalias) {
 		# ignore this, as it's through an interface we don't monitor
+		print "no interface found for $routername $snmpout\n";
 		return;
 	}
-	
+
 	my $dsname;
 	if ($ipversion == 6) {
 	 	$dsname = "${ifalias}_v6_${direction}";
 	} else {
 	 	$dsname = "${ifalias}_${direction}";
 	}
-	
+
 	# put it into the cache
 	my $name = ($peeras) ? "${as}_peer" : $as;
 	if (!$ascache->{$name}) {
 		$ascache->{$name} = {createts => time};
 	}
-	
+
 	$ascache->{$name}->{$dsname} += $noctets;
 	$ascache->{$name}->{updatets} = time;
-	
+
 	if ($ascache->{$name}->{updatets} == $ascache_lastflush) {
 		# cheat a bit here
 		$ascache->{$name}->{updatets}++;
 	}
-	
+
 	# now flush the cache, if necessary
 	flush_cache();
 }
