@@ -5,6 +5,12 @@ A simple tool to generate per-AS traffic graphs from NetFlow/sFlow records
 by Manuel Kasper <mk@neon1.net> for Monzoon Networks AG
 
 
+Update 2026-11-08
+-----------------
+Users who are looking for a modern replacement for AS-Stats may be interested in the following re-implementation from scratch in Python with a React web UI (AI-assisted):
+https://github.com/schadom/as-stats-python
+
+
 Update 2017-02-15
 -----------------
 I currently don't have time to maintain AS-Stats. There have been some (merged) contributions since the last release, so you may want to download the latest repository version instead of the v1.6 release. Also, Nicolas Debrigode has released a more modern Web UI for AS-Stats: https://github.com/nidebr/as-stats-gui
